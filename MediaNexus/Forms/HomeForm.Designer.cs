@@ -110,6 +110,7 @@ namespace MediaNexus
             this.loginButton.TabIndex = 6;
             this.loginButton.Text = "Login";
             this.loginButton.UseVisualStyleBackColor = false;
+            this.loginButton.Click += new System.EventHandler(this.loginButton_Click);
             // 
             // navNameLabel
             // 
@@ -323,16 +324,15 @@ namespace MediaNexus
         #endregion
 
         #region mediaPanel
-        private void createNewMediaPanel()
+        private void createLastMediaPanel()
         {
             int widthNewMedia = (int)(mainPanel.Width * 0.75);
-            int heightNewMedia = (int)(mainPanel.Height * 0.8);
+            int heightNewMedia = (int)(mainPanel.Height * 0.85);
 
-            // Центруємо панель відносно головної панелі
             int xPosition = (mainPanel.Width - widthNewMedia) / 2;
             int yPosition = (mainPanel.Height - heightNewMedia) / 2;
 
-            newMediaPanel = new Panel
+            MediaPanel = new Panel
             {
                 Size = new Size(widthNewMedia, heightNewMedia),
                 Location = new Point(xPosition, yPosition),
@@ -341,74 +341,349 @@ namespace MediaNexus
             createGoToNewMediaButton();
             createMediaPanel();
             createMediaHistoryAndNavPanel();
-            mainPanel.Controls.Add(newMediaPanel);
+            mainPanel.Controls.Add(MediaPanel);
         }
 
         private void createGoToNewMediaButton()
         {
-            int widthButton = newMediaPanel.Width;
+            int widthButton = MediaPanel.Width;
             int heightButton = 25;
 
-            // Позиціюємо кнопку трохи нижче верхнього краю newMediaPanel
-            int xPosition = (newMediaPanel.Width - widthButton) / 2;
+            int xPosition = (MediaPanel.Width - widthButton) / 2;
             int yPosition = 25;
 
-            goToNewMediaButton = new Button()
+            goToNewMediaButton = new Panel()
             {
                 Size = new Size(widthButton, heightButton),
                 Location = new Point(xPosition, yPosition),
-                TextAlign = System.Drawing.ContentAlignment.MiddleLeft,
-                BackColor = Color.FromArgb(100, 100, 100),
-                FlatStyle = FlatStyle.Flat
+                BackColor = Color.FromArgb(100, 100, 100), // Initial background color
             };
 
-            goToNewMediaButton.Text = getTextGTNMButton();
+            TableLayoutPanel goButtonLayout = new TableLayoutPanel
+            {
+                ColumnCount = 2,
+                Dock = DockStyle.Fill,
+                Cursor = Cursors.Hand
+            };
 
-            newMediaPanel.Controls.Add(goToNewMediaButton);
+            goButtonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85F));
+            goButtonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
+
+            Label buttonLabel = new Label()
+            {
+                AutoSize = true,
+                Text = "Go to new media",
+                TextAlign = ContentAlignment.MiddleLeft,
+                Dock = DockStyle.Fill,
+                Anchor = AnchorStyles.Left,
+                ForeColor = Color.White,
+                Cursor = Cursors.Hand
+            };
+
+            Label arrowLabel = new Label()
+            {
+                AutoSize = true,
+                Text = ">",
+                TextAlign = ContentAlignment.MiddleRight,
+                Dock = DockStyle.Fill,
+                Anchor = AnchorStyles.Right,
+                ForeColor = Color.White,
+                Cursor = Cursors.Hand
+            };
+
+            goButtonLayout.Controls.Add(buttonLabel, 0, 0);
+            goButtonLayout.Controls.Add(arrowLabel, 1, 0);
+            goToNewMediaButton.Controls.Add(goButtonLayout);
+
+
+            goButtonLayout.MouseEnter += (s, e) => 
+            { 
+                changeButtonForeColor(buttonLabel, Color.Orange);
+                changeButtonForeColor(arrowLabel, Color.Orange);
+            };
+            goButtonLayout.MouseLeave += (s, e) => {
+                changeButtonForeColor(buttonLabel, Color.White);
+                changeButtonForeColor(arrowLabel, Color.White);
+            };
+
+            MediaPanel.Controls.Add(goToNewMediaButton);
         }
 
         private void createMediaPanel()
         {
-            int widthPanel = newMediaPanel.Width;
-            int heightPanel = (int)(newMediaPanel.Height * 0.6);
+            int widthPanel = MediaPanel.Width;
+            int heightPanel = (int)(MediaPanel.Height * 0.6);
 
-            // Позиціюємо панель нижче кнопки
-            int xPosition = (newMediaPanel.Width - widthPanel) / 2;
+            int xPosition = (MediaPanel.Width - widthPanel) / 2;
             int yPosition = 60;
 
             mediaBlocksPanel = new Panel()
             {
                 Size = new Size(widthPanel, heightPanel),
-                Location = new Point(xPosition, yPosition),
-                BackColor = Color.FromArgb(158, 158, 158)
+                Location = new Point(xPosition, yPosition)
             };
 
-            newMediaPanel.Controls.Add(mediaBlocksPanel);
+            mediaBlocksTableLayoutPanel = CreateMediaBlocksTableLayoutPanel(5, 1);
+
+            mediaBlocksPanel.Controls.Add(mediaBlocksTableLayoutPanel);
+            MediaPanel.Controls.Add(mediaBlocksPanel);
+        }
+
+        private TableLayoutPanel CreateMediaBlocksTableLayoutPanel(int columnCount, int rowCount)
+        {
+            TableLayoutPanel mediaBlocksTableLayoutPanel = new TableLayoutPanel
+            {
+                ColumnCount = columnCount,
+                RowCount = rowCount,
+                Dock = DockStyle.Fill,
+                Margin = new System.Windows.Forms.Padding(0),
+            };
+
+            for (int i = 0; i < columnCount; i++)
+            {
+                mediaBlocksTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / columnCount));
+
+                Panel mediaBlock = CreateMediaBlock(i, columnCount);
+
+                mediaBlocksTableLayoutPanel.Controls.Add(mediaBlock, i, 0);
+            }
+
+            return mediaBlocksTableLayoutPanel;
+        }
+
+        private Panel CreateMediaBlock(int index, int columnCount)
+        {
+            Panel mediaBlock = new Panel()
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White,
+                Name = $"MediaBlock_{index}",
+                Margin = new System.Windows.Forms.Padding(
+                        left: (index == 0) ? 0 : 5,
+                        top: 5,
+                        right: (index == columnCount - 1) ? 0 : 5,
+                        bottom: 5
+                    )
+            };
+
+            TableLayoutPanel mediaBlockTableLayoutPanel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                RowCount = 3,
+                ColumnCount = 1,
+                Margin = new System.Windows.Forms.Padding(0),
+                Cursor = Cursors.Hand
+            };
+
+            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 90F));  
+            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));  
+            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));  
+
+            PictureBox pictureBox = new PictureBox
+            {
+                Dock = DockStyle.Fill,
+                SizeMode = PictureBoxSizeMode.Zoom,
+                ImageLocation = "https://ih1.redbubble.net/image.1066412296.0216/fposter,small,wall_texture,product,750x1000.u4.jpg",
+            };
+
+            mediaBlockTableLayoutPanel.Controls.Add(pictureBox, 0, 0);
+
+            Label titleLabel = new Label
+            {
+                Dock = DockStyle.Fill,
+                Text = "Media Title", 
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Arial", 8, FontStyle.Bold),
+                AutoEllipsis = true, 
+                MaximumSize = new Size(mediaBlock.Width, 0),
+                Name = "titleLabel" 
+            };
+            titleLabel.MouseEnter += (s, e) => changeButtonForeColor(titleLabel, Color.Orange);
+            titleLabel.MouseLeave += (s, e) => changeButtonForeColor(titleLabel, Color.Black);
+
+            mediaBlockTableLayoutPanel.Controls.Add(titleLabel, 0, 1);
+
+            Label studioLabel = new Label
+            {
+                Dock = DockStyle.Fill,
+                Text = "Studio/Publisher", 
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Arial", 8, FontStyle.Regular)
+            };
+            studioLabel.MouseEnter += (s, e) => changeButtonForeColor(titleLabel, Color.Orange);
+            studioLabel.MouseLeave += (s, e) => changeButtonForeColor(titleLabel, Color.Black);
+
+            pictureBox.MouseEnter += (s, e) => changeButtonForeColor(titleLabel, Color.Orange);
+            pictureBox.MouseLeave += (s, e) => changeButtonForeColor(titleLabel, Color.Black);
+
+            mediaBlockTableLayoutPanel.Controls.Add(studioLabel, 0, 2);
+
+            mediaBlock.Controls.Add(mediaBlockTableLayoutPanel);
+
+            return mediaBlock;
         }
 
         private void createMediaHistoryAndNavPanel()
         {
-            int widthPanel = newMediaPanel.Width;
-            int heightPanel = (int)(newMediaPanel.Height * 0.2);
+            int widthPanel = MediaPanel.Width;
+            int heightPanel = (int)(MediaPanel.Height * 0.2);
 
-            // Позиціюємо панель нижче попередньої панелі
-            int xPosition = (newMediaPanel.Width - widthPanel) / 2;
+            int xPosition = (MediaPanel.Width - widthPanel) / 2;
             int yPosition = mediaBlocksPanel.Bottom + 10;
 
             mediaHistoryAndNavPanel = new Panel()
             {
                 Size = new Size(widthPanel, heightPanel),
                 Location = new Point(xPosition, yPosition),
-                BackColor = Color.FromArgb(158, 158, 158)
+                Margin = new Padding(0)
             };
 
-            newMediaPanel.Controls.Add(mediaHistoryAndNavPanel);
+            TableLayoutPanel outerTableLayoutPanel = new TableLayoutPanel
+            {
+                AutoSize = true,
+                ColumnCount = 7,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            outerTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25f));
+            for (int i = 1; i < 7; i++)
+            {
+                if (i % 2 == 0) outerTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20f));    
+                else outerTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5f));
+            }
+
+            for (int i = 2; i < 7; i += 2)
+            {
+                string buttonName = (i == 2) ? "Media" :
+                                    (i == 4) ? "Books" :
+                                    "Comics";
+
+                Color bgColor = (i == 2) ? Color.FromArgb(254, 221, 223) :
+                                    (i == 4) ? Color.FromArgb(218, 241, 255) :
+                                    Color.FromArgb(231, 246, 218);
+
+                Color textColor = (i == 2) ? Color.FromArgb(252, 87, 94) :
+                                    (i == 4) ? Color.FromArgb(68, 187, 255) :
+                                    Color.FromArgb(116, 214, 31);
+
+                Color bpColor = (i == 2) ? Color.FromArgb(254, 194, 197) :
+                                    (i == 4) ? Color.FromArgb(188, 230, 255) :
+                                    Color.FromArgb(215, 239, 195);
+
+                TableLayoutPanel tagsTableLayoutPanel = new TableLayoutPanel
+                {
+
+                    AutoSize = true,
+                    RowCount = 2,
+                    Dock = DockStyle.Fill,
+                    Margin = new Padding(0),
+                };
+
+                tagsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 30f));
+                tagsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 70f));
+
+                Panel a = createMediaButton(buttonName, bgColor, textColor, bpColor);
+
+                tagsTableLayoutPanel.Controls.Add(a, 0, 0);
+                outerTableLayoutPanel.Controls.Add(tagsTableLayoutPanel, i, 0);
+
+                
+            }
+
+            outerTableLayoutPanel.Controls.Add(createHistoryPanel(), 0, 0);
+            mediaHistoryAndNavPanel.Controls.Add(outerTableLayoutPanel);
+            MediaPanel.Controls.Add(mediaHistoryAndNavPanel);
+        }
+
+        private Panel createHistoryPanel()
+        {
+            Panel panel = new Panel
+            {
+                AutoSize = true,
+                BackColor = Color.FromArgb(233, 247, 251),
+                Margin = new Padding(0),
+                Dock = DockStyle.Fill,
+
+            };
+
+            return panel;
+        }
+
+        private Panel createMediaButton(string buttonText, Color bgColor, Color textColor, Color bpColor)
+        {
+            // Create the outer panel that will act as a button
+            Panel buttonPanel = new Panel
+            {
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                BackColor = bgColor,
+                Margin = new Padding(0),
+                Cursor = Cursors.Hand,
+            };
+
+
+            // Create a TableLayoutPanel to hold the text and the ">" symbol
+            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel()
+            {
+                AutoSize = true,
+                ColumnCount = 3,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            // Set column widths: text takes 90%, ">" symbol takes 10%
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5f));
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85F));
+            tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+
+
+            Panel backPanel = new Panel
+            {
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+                BackColor = bpColor,
+            };
+            tableLayoutPanel.Controls.Add(backPanel, 0, 0);
+
+            // Create and add a Label for the text
+            Label textLabel = new Label
+            {
+                AutoSize = true,
+                Text = buttonText,
+                Dock = DockStyle.Fill,
+                BackColor = bgColor,
+                ForeColor = textColor,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Margin = new Padding(0),
+            };
+            tableLayoutPanel.Controls.Add(textLabel, 1, 0);
+
+            // Create and add a Label for the ">" symbol
+            Label arrowLabel = new Label
+            {
+                AutoSize = true,
+                Text = ">",
+                Dock = DockStyle.Fill,
+                BackColor = bgColor,
+                ForeColor = textColor,
+                TextAlign = ContentAlignment.MiddleRight,
+                Margin = new Padding(0),
+            };
+            tableLayoutPanel.Controls.Add(arrowLabel, 2, 0);
+
+            // Add the TableLayoutPanel to the outer panel
+            buttonPanel.Controls.Add(tableLayoutPanel);
+
+            return buttonPanel;
         }
 
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel mainTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel navTableLayoutPanel;
+
         private Label navNameLabel;
         private Button navButton;
         private Panel mainPanel;
@@ -421,10 +696,13 @@ namespace MediaNexus
         private TextBox searchTextBox;
         private Button searchButton;
         private Button loginButton;
-        private Panel newMediaPanel;
+        private Panel MediaPanel;
         private Panel mediaBlocksPanel;
         private Panel mediaHistoryAndNavPanel;
-        private Button goToNewMediaButton;
+        private Panel goToNewMediaButton;
+        private TableLayoutPanel mediaBlocksTableLayoutPanel;
+
+
     }
 }
 
