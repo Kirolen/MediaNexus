@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MediaNexus.Forms;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
@@ -107,7 +108,8 @@ namespace MediaNexus
         }
         private void loginButton_Click(object sender, EventArgs e)
         {
-
+            LoginForm loginForm = new LoginForm();
+            loginForm.ShowDialog();  
         }
 
 
