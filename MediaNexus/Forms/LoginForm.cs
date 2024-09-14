@@ -7,15 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MediaNexus.Class;
 using MediaNexus.Database;
 
 namespace MediaNexus.Forms
 {
     public partial class LoginForm : Form
     {
+        public User LoggedInUser { get; private set; }
+
         public LoginForm()
         {
             InitializeComponent();
+
         }
 
         private void textBoxUsername_Enter(object sender, EventArgs e)
@@ -23,7 +27,7 @@ namespace MediaNexus.Forms
             if (textBoxUsername.Text == "Username")
             {
                 textBoxUsername.Text = "";
-                textBoxUsername.ForeColor = Color.Black;
+                textBoxUsername.ForeColor = Color.White;
             }
         }
 
@@ -41,8 +45,8 @@ namespace MediaNexus.Forms
             if (textBoxPassword.Text == "Password")
             {
                 textBoxPassword.Text = "";
-                textBoxPassword.UseSystemPasswordChar = true;  // Активировать символы для пароля
-                textBoxPassword.ForeColor = Color.Black;
+                textBoxPassword.UseSystemPasswordChar = true;  
+                textBoxPassword.ForeColor = Color.White;
             }
         }
 
@@ -51,7 +55,7 @@ namespace MediaNexus.Forms
             if (string.IsNullOrWhiteSpace(textBoxPassword.Text))
             {
                 textBoxPassword.Text = "Password";
-                textBoxPassword.UseSystemPasswordChar = false; // Отключить скрытие символов, если поле пустое
+                textBoxPassword.UseSystemPasswordChar = false; 
                 textBoxPassword.ForeColor = Color.Gray;
             }
         }
@@ -61,8 +65,32 @@ namespace MediaNexus.Forms
             string loginUser = textBoxUsername.Text;
             string passUser = textBoxPassword.Text;
 
-            bool isLogin = DB.checkLogin(loginUser, passUser);
+            bool verificationSuccessful = DB.checkLogin(loginUser, passUser);
 
+            if (verificationSuccessful)
+            {
+                if (checkBoxRememberMe.Checked)
+                {
+                    Properties.Settings.Default.login = loginUser;
+                    Properties.Settings.Default.password = passUser;
+                    Properties.Settings.Default.Save(); 
+                }
+
+                LoggedInUser = new User { Username = loginUser, Password = passUser }; 
+                this.DialogResult = DialogResult.OK; 
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Invalid username or password. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonRegister_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            RegisterForm regForm = new RegisterForm();
+            regForm.ShowDialog();
         }
     }
 }

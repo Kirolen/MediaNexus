@@ -49,15 +49,9 @@ namespace MediaNexus.Database
             adapter.Fill(table);
 
             if (table.Rows.Count > 0)
-            {
-                MessageBox.Show("Yes");
                 return true;
-            }
             else
-            {
-                MessageBox.Show("No");
                 return false;
-            }
         }
 
 

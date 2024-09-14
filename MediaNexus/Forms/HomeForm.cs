@@ -1,4 +1,6 @@
-﻿using MediaNexus.Forms;
+﻿using MediaNexus.Class;
+using MediaNexus.Database;
+using MediaNexus.Forms;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -8,22 +10,25 @@ namespace MediaNexus
 {
     public partial class HomeForm : Form
     {
+        private User currentUser;
+
         public HomeForm()
         {
             InitializeComponent();
-            // Subscribe to the Resize event using +=
             this.Resize += new EventHandler(HomeForm_Resize);
-            // Optionally set the minimum size of the form
             this.MinimumSize = new Size(800, 600);
             
             createMainMediaPanel();
+            Properties.Settings.Default.login = "";
+            Properties.Settings.Default.password = "";
+            Properties.Settings.Default.Save();
+            checkFastVerification();
+
         }
-
-        // Event handler for form resizing
-
 
 
         #region resizing
+        // Event handler for form resizing
         private void HomeForm_Resize(object sender, EventArgs e)
         {
             ResizeControls();
@@ -103,6 +108,7 @@ namespace MediaNexus
 
         #endregion
 
+        #region Event: button click
         private void navButton_Click(object sender, EventArgs e)
         {
             navMenuPanel.Visible = !navMenuPanel.Visible;
@@ -110,9 +116,42 @@ namespace MediaNexus
         private void loginButton_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
-            loginForm.ShowDialog();  
+            if (loginForm.ShowDialog() == DialogResult.OK)
+            {
+                currentUser = loginForm.LoggedInUser;
+                MessageBox.Show($"Welcome, {currentUser.Username}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                navTableLayoutPanel.Controls.RemoveAt(4);
+            }
+
+        }
+        private void navButton_type_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+
+            string mediaType = "";
+
+            Button clickedButton = sender as Button;
+
+            if (clickedButton == navButton_media) mediaType = "Media";
+            else if (clickedButton == navButton_comics) mediaType = "Comics";
+            else if (clickedButton == navButton_book) mediaType = "Books";
+
+            createMediaListPanel(mediaType);
         }
 
+        private void goToNewMedia_button_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            createMediaListPanel("New");
+        }
+
+        private void navNameLabel_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            createMainMediaPanel();
+        }
+
+        #endregion
 
         #region Enter/Leave events
         private void changeButtonForeColor(Label button, Color newColor)
@@ -159,35 +198,29 @@ namespace MediaNexus
         }
         #endregion
 
-        private void navButton_type_Click(object sender, EventArgs e)
+        public void checkFastVerification()
         {
-            mainPanel.Controls.Clear();
-
-            string mediaType = "";
-
-            Button clickedButton = sender as Button;
-
-            if (clickedButton == navButton_media) mediaType = "Media";
-            else if (clickedButton == navButton_comics) mediaType = "Comics";
-            else if (clickedButton == navButton_book) mediaType = "Books";
-
-            createMediaListPanel(mediaType);
+            string ul = Properties.Settings.Default.login;
+            string up = Properties.Settings.Default.password;
+            bool verificationSuccessful = false;
+            if (ul != null)
+            {
+               verificationSuccessful = DB.checkLogin(ul, up);
+            }
+            if (!verificationSuccessful)
+            {
+                navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
+            }
+            else {
+                Panel userPanel = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    BackColor = Color.White,
+                };
+                navTableLayoutPanel.Controls.Add(userPanel, 4, 0);
+            }
         }
 
-        private void goToNewMedia_button_Click(object sender, EventArgs e)
-        {
-            mainPanel.Controls.Clear();
-
-            createMediaListPanel("New");
-        }
-
-       
-
-
-        private void navNameLabel_Click(object sender, EventArgs e)
-        {
-            mainPanel.Controls.Clear();
-            createMainMediaPanel();
-        }
+      
     }
 }

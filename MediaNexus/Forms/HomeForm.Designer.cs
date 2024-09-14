@@ -79,7 +79,6 @@ namespace MediaNexus
             this.navTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.navTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.navTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.navTableLayoutPanel.Controls.Add(this.loginButton, 4, 0);
             this.navTableLayoutPanel.Controls.Add(this.navNameLabel, 0, 0);
             this.navTableLayoutPanel.Controls.Add(this.navButton, 1, 0);
             this.navTableLayoutPanel.Controls.Add(this.searchTextBox, 2, 0);
@@ -547,9 +546,8 @@ namespace MediaNexus
 
             pictureBox.MouseEnter += (s, e) => changeButtonForeColor(titleLabel, Color.Orange);
             pictureBox.MouseLeave += (s, e) => changeButtonForeColor(titleLabel, Color.Black);
-            
 
-
+            mediaBlockTableLayoutPanel.Controls.Add(titleLabel, 0, 1);
             mediaBlockTableLayoutPanel.Controls.Add(studioLabel, 0, 2);
 
             mediaBlock.Controls.Add(mediaBlockTableLayoutPanel);
@@ -732,6 +730,7 @@ namespace MediaNexus
                 Size = new Size(widthMediaListPanel, heightMediaListPanel),
                 Location = new Point(xPosition, yPosition),
                 BackColor = Color.Green,
+                Margin = new Padding(0)
             };
 
             TableLayoutPanel MediaListTableLayout = new TableLayoutPanel
@@ -754,7 +753,6 @@ namespace MediaNexus
             int minBlockWidth = 150;
             int minBlockHeight = 200;
 
-            // Обчислюємо кількість рядків і стовпців
             int countCols = widthMediaListPanel / minBlockWidth;
             int countRows = heightMediaListPanel / minBlockHeight;
 

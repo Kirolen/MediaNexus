@@ -1,4 +1,7 @@
-﻿namespace MediaNexus.Forms
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace MediaNexus.Forms
 {
     partial class LoginForm
     {
@@ -37,33 +40,36 @@
             // 
             // labelTitle
             // 
-            this.labelTitle.AutoSize = true;
-            this.labelTitle.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Bold);
-            this.labelTitle.Location = new System.Drawing.Point(50, 31);
             this.labelTitle.Name = "labelTitle";
             this.labelTitle.Size = new System.Drawing.Size(257, 29);
-            this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "Login to MediaNexus";
+            this.labelTitle.ForeColor = Color.White;
+            this.labelTitle.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Bold);
+            this.labelTitle.AutoSize = true;
+            this.labelTitle.Location = new System.Drawing.Point(50, 31);   
+            this.labelTitle.TabIndex = 0;
             // 
             // textBoxUsername
             // 
-            this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
-            this.textBoxUsername.Location = new System.Drawing.Point(50, 80);
             this.textBoxUsername.Name = "textBoxUsername";
             this.textBoxUsername.Size = new System.Drawing.Size(300, 22);
-            this.textBoxUsername.TabIndex = 1;
             this.textBoxUsername.Text = "Username";
+            this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
+            this.textBoxUsername.Location = new System.Drawing.Point(50, 80);
+            this.textBoxUsername.BackColor = Color.FromArgb(50, 50, 50);
+            this.textBoxUsername.TabIndex = 1; 
             this.textBoxUsername.Enter += new System.EventHandler(this.textBoxUsername_Enter);
             this.textBoxUsername.Leave += new System.EventHandler(this.textBoxUsername_Leave);
             // 
             // textBoxPassword
             // 
-            this.textBoxPassword.ForeColor = System.Drawing.Color.Gray;
-            this.textBoxPassword.Location = new System.Drawing.Point(50, 120);
             this.textBoxPassword.Name = "textBoxPassword";
             this.textBoxPassword.Size = new System.Drawing.Size(300, 22);
-            this.textBoxPassword.TabIndex = 2;
             this.textBoxPassword.Text = "Password";
+            this.textBoxPassword.ForeColor = System.Drawing.Color.Gray;
+            this.textBoxPassword.Location = new System.Drawing.Point(50, 120);
+            this.textBoxPassword.BackColor = Color.FromArgb(50, 50, 50);
+            this.textBoxPassword.TabIndex = 2;
             this.textBoxPassword.Enter += new System.EventHandler(this.textBoxPassword_Enter);
             this.textBoxPassword.Leave += new System.EventHandler(this.textBoxPassword_Leave);
             // 
@@ -87,6 +93,7 @@
             this.buttonRegister.TabIndex = 4;
             this.buttonRegister.Text = "Register";
             this.buttonRegister.UseVisualStyleBackColor = false;
+            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
             // 
             // checkBoxRememberMe
             // 
@@ -96,9 +103,11 @@
             this.checkBoxRememberMe.Size = new System.Drawing.Size(119, 20);
             this.checkBoxRememberMe.TabIndex = 5;
             this.checkBoxRememberMe.Text = "Remember me";
+            this.checkBoxRememberMe.ForeColor = Color.White;
             // 
             // LoginForm
             // 
+            this.BackColor = Color.FromArgb(30, 30, 30);
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(400, 300);
