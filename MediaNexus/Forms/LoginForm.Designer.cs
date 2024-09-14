@@ -37,36 +37,33 @@
             // 
             // labelTitle
             // 
-
-
             this.labelTitle.AutoSize = true;
             this.labelTitle.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Bold);
             this.labelTitle.Location = new System.Drawing.Point(50, 31);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(260, 29); 
+            this.labelTitle.Size = new System.Drawing.Size(257, 29);
             this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "Login to MediaNexus";
             // 
             // textBoxUsername
             // 
+            this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
             this.textBoxUsername.Location = new System.Drawing.Point(50, 80);
             this.textBoxUsername.Name = "textBoxUsername";
             this.textBoxUsername.Size = new System.Drawing.Size(300, 22);
             this.textBoxUsername.TabIndex = 1;
-            this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
             this.textBoxUsername.Text = "Username";
             this.textBoxUsername.Enter += new System.EventHandler(this.textBoxUsername_Enter);
             this.textBoxUsername.Leave += new System.EventHandler(this.textBoxUsername_Leave);
             // 
             // textBoxPassword
             // 
+            this.textBoxPassword.ForeColor = System.Drawing.Color.Gray;
             this.textBoxPassword.Location = new System.Drawing.Point(50, 120);
             this.textBoxPassword.Name = "textBoxPassword";
             this.textBoxPassword.Size = new System.Drawing.Size(300, 22);
             this.textBoxPassword.TabIndex = 2;
-            this.textBoxPassword.ForeColor = System.Drawing.Color.Gray;
             this.textBoxPassword.Text = "Password";
-            this.textBoxPassword.UseSystemPasswordChar = false;
             this.textBoxPassword.Enter += new System.EventHandler(this.textBoxPassword_Enter);
             this.textBoxPassword.Leave += new System.EventHandler(this.textBoxPassword_Leave);
             // 
@@ -79,6 +76,7 @@
             this.buttonLogin.TabIndex = 3;
             this.buttonLogin.Text = "Login";
             this.buttonLogin.UseVisualStyleBackColor = false;
+            this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
             // 
             // buttonRegister
             // 

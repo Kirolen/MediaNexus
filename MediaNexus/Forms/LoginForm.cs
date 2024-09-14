@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MediaNexus.Database;
 
 namespace MediaNexus.Forms
 {
@@ -55,5 +56,13 @@ namespace MediaNexus.Forms
             }
         }
 
+        private void buttonLogin_Click(object sender, EventArgs e)
+        {
+            string loginUser = textBoxUsername.Text;
+            string passUser = textBoxPassword.Text;
+
+            bool isLogin = DB.checkLogin(loginUser, passUser);
+
+        }
     }
 }
