@@ -15,7 +15,8 @@ namespace MediaNexus
             this.Resize += new EventHandler(HomeForm_Resize);
             // Optionally set the minimum size of the form
             this.MinimumSize = new Size(800, 600);
-            createLastMediaPanel();
+            
+            createMainMediaPanel();
         }
 
         // Event handler for form resizing
@@ -158,5 +159,35 @@ namespace MediaNexus
         }
         #endregion
 
+        private void navButton_type_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+
+            string mediaType = "";
+
+            Button clickedButton = sender as Button;
+
+            if (clickedButton == navButton_media) mediaType = "Media";
+            else if (clickedButton == navButton_comics) mediaType = "Comics";
+            else if (clickedButton == navButton_book) mediaType = "Books";
+
+            createMediaListPanel(mediaType);
+        }
+
+        private void goToNewMedia_button_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+
+            createMediaListPanel("New");
+        }
+
+       
+
+
+        private void navNameLabel_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            createMainMediaPanel();
+        }
     }
 }

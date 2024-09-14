@@ -43,7 +43,7 @@
             this.labelTitle.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Bold);
             this.labelTitle.Location = new System.Drawing.Point(50, 31);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(260, 29); // Залиште розмір таким же або змініть, якщо потрібно
+            this.labelTitle.Size = new System.Drawing.Size(260, 29); 
             this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "Login to MediaNexus";
             // 
