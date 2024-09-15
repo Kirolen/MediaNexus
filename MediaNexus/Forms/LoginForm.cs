@@ -76,7 +76,7 @@ namespace MediaNexus.Forms
                     Properties.Settings.Default.Save(); 
                 }
 
-                LoggedInUser = new User { Username = loginUser, Password = passUser }; 
+                LoggedInUser = new User(loginUser, passUser, "User"); 
                 this.DialogResult = DialogResult.OK; 
                 this.Close();
             }

@@ -10,7 +10,7 @@ namespace MediaNexus
 {
     public partial class HomeForm : Form
     {
-        private User currentUser;
+        private User currentUser = new User();
 
         public HomeForm()
         {
@@ -19,9 +19,9 @@ namespace MediaNexus
             this.MinimumSize = new Size(800, 600);
             
             createMainMediaPanel();
-            Properties.Settings.Default.login = "";
-            Properties.Settings.Default.password = "";
-            Properties.Settings.Default.Save();
+            //Properties.Settings.Default.login = "";
+            //Properties.Settings.Default.password = "";
+            //Properties.Settings.Default.Save();
             checkFastVerification();
 
         }
@@ -45,7 +45,7 @@ namespace MediaNexus
 
         private void navMenuResize()
         {
-            navMenuPanel.Size = new Size(navButton.Width, 130);
+            navMenuPanel.Size = new Size(navButton.Width, 160);
             navMenuPanel.Location = new Point(navButton.Location.X, navButton.Location.Y);
         }
 
@@ -113,6 +113,12 @@ namespace MediaNexus
         {
             navMenuPanel.Visible = !navMenuPanel.Visible;
         }
+
+        private void userPanel_Click(object sender, EventArgs e)
+        {
+            userNav.Visible = !userNav.Visible;
+            
+        }
         private void loginButton_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
@@ -121,6 +127,7 @@ namespace MediaNexus
                 currentUser = loginForm.LoggedInUser;
                 MessageBox.Show($"Welcome, {currentUser.Username}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 navTableLayoutPanel.Controls.RemoveAt(4);
+                addUserPanel(currentUser.Username);
             }
 
         }
@@ -212,12 +219,8 @@ namespace MediaNexus
                 navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
             }
             else {
-                Panel userPanel = new Panel
-                {
-                    Dock = DockStyle.Fill,
-                    BackColor = Color.White,
-                };
-                navTableLayoutPanel.Controls.Add(userPanel, 4, 0);
+                currentUser = new User(ul, up, "User");
+                addUserPanel(currentUser.Username);
             }
         }
 
