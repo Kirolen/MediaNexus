@@ -1,4 +1,6 @@
-﻿using System.Data.SqlTypes;
+﻿using MediaNexus.Class;
+using System;
+using System.Data.SqlTypes;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -229,7 +231,7 @@ namespace MediaNexus
             this.navButton_media.Margin = new System.Windows.Forms.Padding(0);
             this.navButton_media.Name = "navButton_media";
             this.navButton_media.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.navButton_media.Size = new System.Drawing.Size(179, 43);
+            this.navButton_media.Size = new System.Drawing.Size(179, 40);
             this.navButton_media.TabIndex = 3;
             this.navButton_media.Text = "Media";
             this.navButton_media.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -251,7 +253,7 @@ namespace MediaNexus
             this.navButton_comics.Margin = new System.Windows.Forms.Padding(0);
             this.navButton_comics.Name = "navButton_comics";
             this.navButton_comics.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.navButton_comics.Size = new System.Drawing.Size(179, 43);
+            this.navButton_comics.Size = new System.Drawing.Size(179, 40);
             this.navButton_comics.TabIndex = 8;
             this.navButton_comics.Text = "Comics";
             this.navButton_comics.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -273,7 +275,7 @@ namespace MediaNexus
             this.navButton_book.Margin = new System.Windows.Forms.Padding(0);
             this.navButton_book.Name = "navButton_book";
             this.navButton_book.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.navButton_book.Size = new System.Drawing.Size(179, 43);
+            this.navButton_book.Size = new System.Drawing.Size(179, 40);
             this.navButton_book.TabIndex = 7;
             this.navButton_book.Text = "Books";
             this.navButton_book.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -320,7 +322,6 @@ namespace MediaNexus
         #endregion
 
         #region nav Menu Panel
-
         private void createNavMenuPanel(string currentPage)
         {
             this.navButton.Text = currentPage;
@@ -333,6 +334,7 @@ namespace MediaNexus
         private void createMainMediaPanel()
         {
             createNavMenuPanel("⌂ Home");
+            if (currentUser.Username != string.Empty) createUserNav();
 
             int widthNewMedia = (int)(mainPanel.Width * 0.75);
             int heightNewMedia = (int)(mainPanel.Height * 0.85);
@@ -713,10 +715,11 @@ namespace MediaNexus
         #endregion
 
         #region media list
-        
         private void createMediaListPanel(string typeMedia)
         {
             createNavMenuPanel(typeMedia);
+            if (currentUser.Username != string.Empty) createUserNav();
+
 
             int widthMediaListPanel = (int)(mainPanel.Width * 0.75);
             int heightMediaListPanel = (int)(mainPanel.Height * 0.85);
@@ -834,55 +837,59 @@ namespace MediaNexus
         {
             userNav = new Panel
             {
-                Size = new Size(140, 140), // Increased the height to fit all rows
+                Size = new Size(140, 180),
                 Location = new Point(userPanel.Location.X, userPanel.Location.Y),
-                BackColor = Color.AliceBlue,
+                BackColor = Color.FromArgb(20, 20, 20),
                 Visible = false,
                 Margin = new Padding(0)
             };
 
             TableLayoutPanel userNavLayout = new TableLayoutPanel
             {
-                RowCount = 4,
+                RowCount = 5,
                 ColumnCount = 1,
                 Dock = DockStyle.Fill,
                 Margin = new Padding(0)
             };
 
             userNavLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F)); // Increased height for label row
-            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F)); // Adjusted to fit better within total height
+            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 25F)); 
+            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F)); 
+            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
 
             Label label = new Label
             {
-                Text = "Account", // Fixed typo from "Acount"
+                Text = "Account", 
                 TextAlign = ContentAlignment.MiddleLeft,
-      
-                ForeColor = Color.Black,
+                ForeColor = Color.White,
                 BackColor = Color.Transparent,
-                Dock = DockStyle.Fill // Ensures label takes up full cell space
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
             };
 
             userNavLayout.Controls.Add(label, 0, 0);
 
-            // Adding buttons to the next three rows
-            userNavLayout.Controls.Add(createUserNavButton("My Media List"), 0, 1);
-            userNavLayout.Controls.Add(createUserNavButton("Settings"), 0, 2);
-            userNavLayout.Controls.Add(createUserNavButton("Exit"), 0, 3);
+            userNavLayout.Controls.Add(createUserNavButton("Profile", ProfileButton_Click), 0, 1);
+            userNavLayout.Controls.Add(createUserNavButton("My Media List", ProfileButton_Click), 0, 2);
+            userNavLayout.Controls.Add(createUserNavButton("Settings", ProfileButton_Click), 0, 3);
+            userNavLayout.Controls.Add(createUserNavButton("Exit", ProfileButton_Click), 0, 4);
 
             userNav.Controls.Add(userNavLayout);
             this.mainPanel.Controls.Add(userNav);
             userNav.BringToFront();
         }
 
-        private Panel createUserNavButton(string buttonText)
+        private Panel createUserNavButton(string buttonText, ButtonClickHandler onClick)
         {
+            Color CircleColor = Color.White;
+
             Panel button = new Panel
             {
                 Dock = DockStyle.Fill,
-                Margin = new Padding(0)
+                Margin = new Padding(0),
+                BackColor = Color.Transparent 
             };
 
             TableLayoutPanel buttonLayout = new TableLayoutPanel
@@ -893,52 +900,189 @@ namespace MediaNexus
                 Margin = new Padding(0)
             };
 
-            buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 40F)); // Fixed width for the symbol
-            buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));  // Remaining space for text
+            buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 30F)); 
+            buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));  
 
             Label symbol = new Label
             {
-                Text = "M",
+                Text = buttonText[0].ToString(),
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
                 TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                Size = new Size(40, 40), // Fixed size for the circle
-                ForeColor = Color.Black,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold), 
+                Size = new Size(30, 30), 
+                ForeColor = Color.White,
                 BackColor = Color.Transparent
             };
 
-            // Event to draw the circle around the symbol
             symbol.Paint += (s, e) =>
             {
                 Control control = (Control)s;
-                using (Pen pen = new Pen(Color.Black, 2))
+                int diameter = Math.Min(control.Width, control.Height) - 5; 
+                using (Pen pen = new Pen(CircleColor, 2))
                 {
                     e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                    e.Graphics.DrawEllipse(pen, new Rectangle(0, 0, control.Width - 5, control.Height - 5));
+                    e.Graphics.DrawEllipse(pen, new Rectangle((control.Width - diameter) / 2 - 1, (control.Height - diameter) / 2, diameter, diameter));
                 }
             };
-
             Label buttonName = new Label
             {
                 Text = buttonText,
-                TextAlign = ContentAlignment.MiddleLeft, // Align text to the left
-                Font = new Font("Segoe UI", 12, FontStyle.Regular), // Reduced font size for better fit
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Segoe UI", 12, FontStyle.Regular),
                 Dock = DockStyle.Fill,
-                ForeColor = Color.Black,
+                Margin = new Padding(0),
+                ForeColor = Color.White,
                 BackColor = Color.Transparent
             };
 
-            // Add symbol and text to button layout
-            buttonLayout.Controls.Add(symbol, 0, 0);
-            buttonLayout.Controls.Add(buttonName, 1, 0);
+            buttonLayout.Controls.Add(symbol, 0, 0);    
+            buttonLayout.Controls.Add(buttonName, 1, 0); 
 
-            // Add button layout to button panel
             button.Controls.Add(buttonLayout);
+
+
+            Label[] labels = new Label[] {buttonName, symbol};
+            foreach (Label label in labels)
+            {
+                label.Click += (s, e) => onClick(s, e);
+
+                label.MouseEnter += (s, e) =>
+                {
+                    button.BackColor = Color.White;
+                    buttonName.ForeColor = Color.Black;
+                    symbol.ForeColor = Color.Black;
+                    CircleColor = Color.Black;
+                    symbol.Invalidate();
+                };
+
+
+                label.MouseLeave += (s, e) =>
+                {
+                    button.BackColor = Color.FromArgb(20, 20, 20);
+                    buttonName.ForeColor = Color.White;
+                    symbol.ForeColor = Color.White;
+                    CircleColor = Color.White;
+                    symbol.Invalidate();
+                };
+            }
 
             return button;
         }
 
 
-        #endregion 
+
+
+        #endregion
+
+        #region Profile
+
+        void createProfile(User user)
+        {
+            createNavMenuPanel("Profile");
+
+            int widthNewMedia = (int)(mainPanel.Width * 0.75);
+            int heightNewMedia = (int)(mainPanel.Height * 0.85);
+
+            int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+            int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+
+            ProfilePanel = new Panel
+            {
+                Size = new Size(widthNewMedia, heightNewMedia),
+                Location = new Point(xPosition, yPosition),
+            };
+
+            TableLayoutPanel ProfileLayout = new TableLayoutPanel
+            {
+                RowCount = 2,
+                ColumnCount = 2,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            ProfileLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 200F));
+            ProfileLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 85));
+
+            ProfileLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
+            ProfileLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+            ProfilePanel.Controls.Add(ProfileLayout);
+            ProfileLayout.Controls.Add(createProfilePicture(), 0, 0);
+            ProfileLayout.Controls.Add(createUserInfo(user), 1, 0);
+            Panel MediaPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.LightGray 
+            };
+            ProfilePanel.Controls.Add(MediaPanel);
+
+            mainPanel.Controls.Add(ProfilePanel); 
+        }
+
+        PictureBox createProfilePicture()
+        {
+
+            PictureBox profilePicture = new PictureBox
+            {
+                Size = new Size(200, 200),
+                ImageLocation = "https://ih1.redbubble.net/image.1066412296.0216/fposter,small,wall_texture,product,750x1000.u4.jpg",
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                BorderStyle = BorderStyle.FixedSingle,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            return profilePicture;
+        }
+
+        Panel createUserInfo(User user)
+        {
+            Panel userInfoPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10),
+                BackColor = Color.Transparent
+            };
+
+            // Create labels for user information
+            Label nameLabel = new Label
+            {
+                Text = "USER",
+                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ForeColor = Color.White
+            };
+
+            Label lastVisitLabel = new Label
+            {
+                Text = $"Last visit: ",
+                Font = new Font("Segoe UI", 15),
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ForeColor = Color.White
+            };
+
+            Label registrationDateLabel = new Label
+            {
+                Text = $"In the application since: ",
+                Font = new Font("Segoe UI", 15),
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ForeColor = Color.White
+            };
+
+            // Add labels to the userInfoPanel
+            userInfoPanel.Controls.Add(registrationDateLabel);
+            userInfoPanel.Controls.Add(lastVisitLabel);
+            userInfoPanel.Controls.Add(nameLabel);
+
+            return userInfoPanel;
+        }
+
+        #endregion
+
 
         private System.Windows.Forms.TableLayoutPanel mainTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel navTableLayoutPanel;
@@ -962,6 +1106,7 @@ namespace MediaNexus
         private Panel goToNewMediaButton;
         private Panel userPanel;
         private Panel userNav;
+        private Panel ProfilePanel;
 
         private TextBox searchTextBox;
 

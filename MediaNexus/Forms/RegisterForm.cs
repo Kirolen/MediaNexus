@@ -1,14 +1,10 @@
-﻿using MediaNexus.Database;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using System.Text;
+using MediaNexus_Backend;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace MediaNexus.Forms
 {
@@ -18,27 +14,36 @@ namespace MediaNexus.Forms
         {
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;  
+            this.MaximizeBox = false;
         }
-
+        
         #region Event: button click
-        //private void buttonRegister_Click(object sender, EventArgs e)
-        //{
-        //    string username = textBoxUsername.Text;
-        //    string password = textBoxPassword.Text;
-        //    string email = textBoxEmail.Text;
+        private void buttonRegister_Click(object sender, EventArgs e)
+        {
+            string userLogin = textBoxUsername.Text;
+            string password = textBoxPassword.Text;
+            string email = textBoxEmail.Text;
+          
+            RegisterResult isRegistered = MNBackend.Register(userLogin, password, email);
 
-        //    bool isRegistered = DB.registerUser(username, password, email);
-        //    if (isRegistered)
-        //    {
-        //        MessageBox.Show("Registration successful!");
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Registration failed!");
-        //    }
-        //}
-
+            if (isRegistered == RegisterResult.Success)
+            {
+                MessageBox.Show("Registration successful!");
+            }
+            else if (isRegistered == RegisterResult.UserLoginTaken)
+            {
+                MessageBox.Show("User login is already taken.");
+            }
+            else if (isRegistered == RegisterResult.EmailTaken)
+            {
+                MessageBox.Show("Email is already taken.");
+            }
+            else
+            {
+                MessageBox.Show("Registration failed!");
+            }
+            this.Close();
+        }
         #endregion
 
         #region Event: Enter/Leave
@@ -98,5 +103,6 @@ namespace MediaNexus.Forms
             }
         }
         #endregion
+
     }
 }

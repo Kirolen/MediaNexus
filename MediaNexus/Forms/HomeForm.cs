@@ -1,5 +1,5 @@
 ﻿using MediaNexus.Class;
-using MediaNexus.Database;
+using MediaNexus_Backend;
 using MediaNexus.Forms;
 using System;
 using System.Drawing;
@@ -10,6 +10,7 @@ namespace MediaNexus
 {
     public partial class HomeForm : Form
     {
+        private delegate void ButtonClickHandler(object sender, EventArgs e);
         private User currentUser = new User();
 
         public HomeForm()
@@ -40,7 +41,9 @@ namespace MediaNexus
             navTableLayoutPanel.Width = this.ClientSize.Width;
 
             navMenuResize();
-            newMediaPanelResize();
+            RecentMediaPanelResize();
+            UserPanelLocation();
+            ProfilePanelResize();
         }
 
         private void navMenuResize()
@@ -48,8 +51,7 @@ namespace MediaNexus
             navMenuPanel.Size = new Size(navButton.Width, 160);
             navMenuPanel.Location = new Point(navButton.Location.X, navButton.Location.Y);
         }
-
-        private void newMediaPanelResize()
+        private void RecentMediaPanelResize()
         {
             if (MediaPanel != null)
             {
@@ -63,10 +65,10 @@ namespace MediaNexus
                 MediaPanel.Location = new Point(xPosition, yPosition);
 
                 gtnmButtonResize();
-                mediaPanelResize();
+                RecentMediaPanelElementsResize();
             }
         }
-        private void mediaPanelResize()
+        private void RecentMediaPanelElementsResize()
         {
             if (MediaPanel != null && mediaBlocksPanel != null && mediaHistoryAndNavPanel != null)
             {
@@ -88,6 +90,23 @@ namespace MediaNexus
                 );
             }
         }
+
+        private void ProfilePanelResize()
+        {
+            if (ProfilePanel != null)
+            {
+                int widthNewMedia = (int)(mainPanel.Width * 0.75);
+                int heightNewMedia = (int)(mainPanel.Height * 0.85);
+
+                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+                
+                ProfilePanel.Size = new Size(widthNewMedia, heightNewMedia);
+                ProfilePanel.Location = new Point(xPosition, yPosition);
+            }
+
+            
+        }
         private void gtnmButtonResize()
         {
             if (MediaPanel != null)
@@ -104,6 +123,11 @@ namespace MediaNexus
                     );
                 }
             }
+        }
+
+        private void UserPanelLocation()
+        {
+            if (userNav != null && userPanel != null) userNav.Location = new Point(userPanel.Location.X, userPanel.Location.Y);
         }
 
         #endregion
@@ -129,7 +153,6 @@ namespace MediaNexus
                 navTableLayoutPanel.Controls.RemoveAt(4);
                 addUserPanel(currentUser.Username);
             }
-
         }
         private void navButton_type_Click(object sender, EventArgs e)
         {
@@ -155,7 +178,14 @@ namespace MediaNexus
         private void navNameLabel_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
-            createMainMediaPanel();
+            createMainMediaPanel();          
+        }
+
+        private void ProfileButton_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            createProfile(currentUser);
+            createUserNav();
         }
 
         #endregion
@@ -209,18 +239,13 @@ namespace MediaNexus
         {
             string ul = Properties.Settings.Default.login;
             string up = Properties.Settings.Default.password;
-            bool verificationSuccessful = false;
-            if (ul != null)
+            if (ul != null && MNBackend.CheckLogin(ul, up))
             {
-               verificationSuccessful = DB.checkLogin(ul, up);
-            }
-            if (!verificationSuccessful)
-            {
-                navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
-            }
-            else {
                 currentUser = new User(ul, up, "User");
                 addUserPanel(currentUser.Username);
+            }
+            else {
+                navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
             }
         }
 

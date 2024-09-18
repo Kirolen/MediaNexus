@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MediaNexus.Class;
-using MediaNexus.Database;
+using MediaNexus_Backend;
+
 
 namespace MediaNexus.Forms
 {
@@ -19,7 +20,6 @@ namespace MediaNexus.Forms
         public LoginForm()
         {
             InitializeComponent();
-
         }
 
         private void textBoxUsername_Enter(object sender, EventArgs e)
@@ -65,7 +65,7 @@ namespace MediaNexus.Forms
             string loginUser = textBoxUsername.Text;
             string passUser = textBoxPassword.Text;
 
-            bool verificationSuccessful = DB.checkLogin(loginUser, passUser);
+            bool verificationSuccessful = MNBackend.CheckLogin(loginUser, passUser);
 
             if (verificationSuccessful)
             {

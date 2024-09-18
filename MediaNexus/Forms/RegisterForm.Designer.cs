@@ -32,72 +32,85 @@ namespace MediaNexus.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBoxUsername = new TextBox();
-            this.textBoxPassword = new TextBox();
-            this.textBoxEmail = new TextBox();
-            this.buttonRegister = new Button();
-            //
-            // Form settings
-            //
-            this.ClientSize = new Size(400, 350);
-            this.Text = "Register";
-            this.BackColor = Color.FromArgb(30, 30, 30);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.StartPosition = FormStartPosition.CenterScreen;
-            //
-            // Username TextBox
-            //
-            this.textBoxUsername.Size = new Size(300, 30);
+            this.textBoxUsername = new System.Windows.Forms.TextBox();
+            this.textBoxPassword = new System.Windows.Forms.TextBox();
+            this.textBoxEmail = new System.Windows.Forms.TextBox();
+            this.buttonRegister = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // textBoxUsername
+            // 
+            this.textBoxUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.textBoxUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxUsername.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
+            this.textBoxUsername.Location = new System.Drawing.Point(50, 50);
+            this.textBoxUsername.Name = "textBoxUsername";
+            this.textBoxUsername.Size = new System.Drawing.Size(300, 34);
+            this.textBoxUsername.TabIndex = 0;
             this.textBoxUsername.Text = "Username";
-            this.textBoxUsername.Font = new Font("Segoe UI", 12);
-            this.textBoxUsername.ForeColor = Color.Gray;
-            this.textBoxUsername.BackColor = Color.FromArgb(50, 50, 50);
-            this.textBoxUsername.BorderStyle = BorderStyle.FixedSingle;
-            this.textBoxUsername.Location = new Point(50, 50);
             this.textBoxUsername.Enter += new System.EventHandler(this.textBoxUsername_Enter);
             this.textBoxUsername.Leave += new System.EventHandler(this.textBoxUsername_Leave);
-            //
-            // Password TextBox
-            //
-            this.textBoxPassword.Size = new Size(300, 30);
+            // 
+            // textBoxPassword
+            // 
+            this.textBoxPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.textBoxPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxPassword.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.textBoxPassword.ForeColor = System.Drawing.Color.Gray;
+            this.textBoxPassword.Location = new System.Drawing.Point(50, 100);
+            this.textBoxPassword.Name = "textBoxPassword";
+            this.textBoxPassword.Size = new System.Drawing.Size(300, 34);
+            this.textBoxPassword.TabIndex = 1;
             this.textBoxPassword.Text = "Password";
-            this.textBoxPassword.ForeColor = Color.Gray;
-            this.textBoxPassword.Font = new Font("Segoe UI", 12);
-            this.textBoxPassword.BackColor = Color.FromArgb(50, 50, 50);
-            this.textBoxPassword.BorderStyle = BorderStyle.FixedSingle;
-            this.textBoxPassword.Location = new Point(50, 100);
             this.textBoxPassword.Enter += new System.EventHandler(this.textBoxPassword_Enter);
             this.textBoxPassword.Leave += new System.EventHandler(this.textBoxPassword_Leave);
-            //
-            // Email TextBox
-            //
-            this.textBoxEmail.Size = new Size(300, 30);
+            // 
+            // textBoxEmail
+            // 
+            this.textBoxEmail.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.textBoxEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxEmail.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.textBoxEmail.ForeColor = System.Drawing.Color.Gray;
+            this.textBoxEmail.Location = new System.Drawing.Point(50, 150);
+            this.textBoxEmail.Name = "textBoxEmail";
+            this.textBoxEmail.Size = new System.Drawing.Size(300, 34);
+            this.textBoxEmail.TabIndex = 2;
             this.textBoxEmail.Text = "Email";
-            this.textBoxEmail.Font = new Font("Segoe UI", 12);
-            this.textBoxEmail.ForeColor = Color.Gray;
-            this.textBoxEmail.BackColor = Color.FromArgb(50, 50, 50);
-            this.textBoxEmail.BorderStyle = BorderStyle.FixedSingle;
-            this.textBoxEmail.Location = new Point(50, 150);
             this.textBoxEmail.Enter += new System.EventHandler(this.textBoxEmail_Enter);
             this.textBoxEmail.Leave += new System.EventHandler(this.textBoxEmail_Leave);
-            //
-            //Register Button
-            //
-            this.buttonRegister.Text = "Register";
-            this.buttonRegister.ForeColor = Color.Black;
-            this.buttonRegister.BackColor = Color.LightBlue;
-            this.buttonRegister.FlatStyle = FlatStyle.Flat;
+            // 
+            // buttonRegister
+            // 
+            this.buttonRegister.BackColor = System.Drawing.Color.LightBlue;
+            this.buttonRegister.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonRegister.FlatAppearance.BorderSize = 0;
-            this.buttonRegister.Size = new Size(120, 40);
-            this.buttonRegister.Location = new Point(140, 220);
-            this.buttonRegister.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-            this.buttonRegister.Cursor = Cursors.Hand;
-            //this.buttonRegister.Click += new EventHandler(buttonRegister_Click);
-
+            this.buttonRegister.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonRegister.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.buttonRegister.ForeColor = System.Drawing.Color.Black;
+            this.buttonRegister.Location = new System.Drawing.Point(140, 220);
+            this.buttonRegister.Name = "buttonRegister";
+            this.buttonRegister.Size = new System.Drawing.Size(120, 40);
+            this.buttonRegister.TabIndex = 3;
+            this.buttonRegister.Text = "Register";
+            this.buttonRegister.UseVisualStyleBackColor = false;
+            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+            // 
+            // RegisterForm
+            // 
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.ClientSize = new System.Drawing.Size(400, 350);
             this.Controls.Add(this.textBoxUsername);
             this.Controls.Add(this.textBoxPassword);
             this.Controls.Add(this.textBoxEmail);
             this.Controls.Add(this.buttonRegister);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Name = "RegisterForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Register";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
