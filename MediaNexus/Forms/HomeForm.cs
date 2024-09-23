@@ -44,6 +44,7 @@ namespace MediaNexus
             RecentMediaPanelResize();
             UserPanelLocation();
             ProfilePanelResize();
+            ProfileSettingsPanelResize();
         }
 
         private void navMenuResize()
@@ -90,13 +91,14 @@ namespace MediaNexus
                 );
             }
         }
-
         private void ProfilePanelResize()
         {
             if (ProfilePanel != null)
             {
                 int widthNewMedia = (int)(mainPanel.Width * 0.75);
-                int heightNewMedia = (int)(mainPanel.Height * 0.85);
+                int heightNewMedia = ProfilePanel.Height;
+
+                if (widthNewMedia > 800) widthNewMedia = 880;
 
                 int xPosition = (mainPanel.Width - widthNewMedia) / 2;
                 int yPosition = (mainPanel.Height - heightNewMedia) / 2;
@@ -104,8 +106,23 @@ namespace MediaNexus
                 ProfilePanel.Size = new Size(widthNewMedia, heightNewMedia);
                 ProfilePanel.Location = new Point(xPosition, yPosition);
             }
+        }
 
-            
+        private void ProfileSettingsPanelResize()
+        {
+            if (ProfileSettingsPanel != null)
+            {
+                int widthNewMedia = (int)(mainPanel.Width * 0.75);
+                int heightNewMedia = ProfileSettingsPanel.Height;
+
+                if (widthNewMedia > 800) widthNewMedia = 880;
+
+                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+
+                ProfileSettingsPanel.Size = new Size(widthNewMedia, heightNewMedia);
+                ProfileSettingsPanel.Location = new Point(xPosition, yPosition);
+            }
         }
         private void gtnmButtonResize()
         {
@@ -124,7 +141,6 @@ namespace MediaNexus
                 }
             }
         }
-
         private void UserPanelLocation()
         {
             if (userNav != null && userPanel != null) userNav.Location = new Point(userPanel.Location.X, userPanel.Location.Y);
@@ -168,7 +184,6 @@ namespace MediaNexus
 
             createMediaListPanel(mediaType);
         }
-
         private void goToNewMedia_button_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
@@ -178,14 +193,31 @@ namespace MediaNexus
         private void navNameLabel_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
-            createMainMediaPanel();          
+            createMainMediaPanel();
         }
 
         private void ProfileButton_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
             createProfile(currentUser);
-            createUserNav();
+        }
+
+        private void ExitButton_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            navTableLayoutPanel.Controls.RemoveAt(4);
+            currentUser = new User();
+            Properties.Settings.Default.login = "";
+            Properties.Settings.Default.password = "";
+            Properties.Settings.Default.Save();
+            navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
+            createMainMediaPanel();
+        }
+
+        private void ProfileSettingsButton_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            createSettingsPanel(currentUser);
         }
 
         #endregion

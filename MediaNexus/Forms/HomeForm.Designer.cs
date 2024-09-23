@@ -4,6 +4,7 @@ using System.Data.SqlTypes;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using static System.Net.WebRequestMethods;
 
 namespace MediaNexus
 {
@@ -321,11 +322,17 @@ namespace MediaNexus
 
         #endregion
 
-        #region nav Menu Panel
+        #region Navigation Menu Panel
+        /// <summary>
+        /// Updates the navigation menu panel by setting the current page name and ensuring
+        /// the navigation menu panel is added to the main panel and brought to the front.
+        /// </summary>
+        /// <param name="currentPage">A string representing the name of the current page. This will be set as the text of the navButton.</param>
         private void createNavMenuPanel(string currentPage)
         {
             this.navButton.Text = currentPage;
             this.mainPanel.Controls.Add(this.navMenuPanel);
+            navMenuPanel.BringToFront();
         }
 
         #endregion
@@ -348,13 +355,14 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition),
             };
 
-            createGoToNewMediaButton();
+            MediaPanel.Controls.Add(createGoToNewMediaButton()); 
             CreateRecentMediaPanel();
             createMediaHistoryAndNavPanel();
+
             mainPanel.Controls.Add(MediaPanel);
         }
 
-        private void createGoToNewMediaButton()
+        private Panel createGoToNewMediaButton()
         {
             int widthButton = MediaPanel.Width;
             int heightButton = 25;
@@ -401,7 +409,6 @@ namespace MediaNexus
                 Cursor = Cursors.Hand
             };
 
-
             Label[] labels = { buttonLabel, arrowLabel };
             foreach (Label label in labels)
             {
@@ -434,7 +441,7 @@ namespace MediaNexus
                 changeButtonForeColor(arrowLabel, Color.White);
             };
 
-            MediaPanel.Controls.Add(goToNewMediaButton);
+            return goToNewMediaButton;
         }
 
         private void CreateRecentMediaPanel()
@@ -645,7 +652,6 @@ namespace MediaNexus
 
         private Panel createMediaButton(string buttonText, Color bgColor, Color textColor, Color bpColor)
         {
-            // Create the outer panel that will act as a button
             Panel buttonPanel = new Panel
             {
                 AutoSize = true,
@@ -655,8 +661,6 @@ namespace MediaNexus
                 Cursor = Cursors.Hand,
             };
 
-
-            // Create a TableLayoutPanel to hold the text and the ">" symbol
             TableLayoutPanel tableLayoutPanel = new TableLayoutPanel()
             {
                 AutoSize = true,
@@ -665,11 +669,9 @@ namespace MediaNexus
                 Margin = new Padding(0)
             };
 
-            // Set column widths: text takes 90%, ">" symbol takes 10%
             tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5f));
             tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85F));
             tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-
 
             Panel backPanel = new Panel
             {
@@ -693,7 +695,6 @@ namespace MediaNexus
             };
             tableLayoutPanel.Controls.Add(textLabel, 1, 0);
 
-            // Create and add a Label for the ">" symbol
             Label arrowLabel = new Label
             {
                 AutoSize = true,
@@ -706,7 +707,6 @@ namespace MediaNexus
             };
             tableLayoutPanel.Controls.Add(arrowLabel, 2, 0);
 
-            // Add the TableLayoutPanel to the outer panel
             buttonPanel.Controls.Add(tableLayoutPanel);
 
             return buttonPanel;
@@ -872,16 +872,16 @@ namespace MediaNexus
             userNavLayout.Controls.Add(label, 0, 0);
 
             userNavLayout.Controls.Add(createUserNavButton("Profile", ProfileButton_Click), 0, 1);
-            userNavLayout.Controls.Add(createUserNavButton("My Media List", ProfileButton_Click), 0, 2);
-            userNavLayout.Controls.Add(createUserNavButton("Settings", ProfileButton_Click), 0, 3);
-            userNavLayout.Controls.Add(createUserNavButton("Exit", ProfileButton_Click), 0, 4);
+            userNavLayout.Controls.Add(createUserNavButton("My Media List", ExitButton_Click), 0, 2); //change
+            userNavLayout.Controls.Add(createUserNavButton("Settings", ProfileSettingsButton_Click), 0, 3);
+            userNavLayout.Controls.Add(createUserNavButton("Exit", ExitButton_Click), 0, 4);
 
             userNav.Controls.Add(userNavLayout);
             this.mainPanel.Controls.Add(userNav);
             userNav.BringToFront();
         }
 
-        private Panel createUserNavButton(string buttonText, ButtonClickHandler onClick)
+        private Panel createUserNavButton(string buttonText, EventHandler onClick)
         {
             Color CircleColor = Color.White;
 
@@ -956,7 +956,6 @@ namespace MediaNexus
                     symbol.Invalidate();
                 };
 
-
                 label.MouseLeave += (s, e) =>
                 {
                     button.BackColor = Color.FromArgb(20, 20, 20);
@@ -969,21 +968,16 @@ namespace MediaNexus
 
             return button;
         }
-
-
-
-
         #endregion
 
         #region Profile
-
         void createProfile(User user)
         {
             createNavMenuPanel("Profile");
+            createUserNav();
 
             int widthNewMedia = (int)(mainPanel.Width * 0.75);
-            int heightNewMedia = (int)(mainPanel.Height * 0.85);
-
+            int heightNewMedia = 400;
             int xPosition = (mainPanel.Width - widthNewMedia) / 2;
             int yPosition = (mainPanel.Height - heightNewMedia) / 2;
 
@@ -993,49 +987,208 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition),
             };
 
+            TableLayoutPanel ProfileLayout = CreateProfileLayout();
+            ProfilePanel.Controls.Add(ProfileLayout);
+
+            // User Info Section
+            TableLayoutPanel UserInfoLayout = CreateUserInfoLayout();
+            ProfileLayout.Controls.Add(UserInfoLayout);
+            UserInfoLayout.Controls.Add(createProfilePicture(), 0, 0);
+            UserInfoLayout.Controls.Add(createUserInfo(user), 1, 0);
+
+            // All Info Section (Media, Books, Comics)
+            TableLayoutPanel ALLInfoLayout = CreateALLInfoLayout();
+            ProfileLayout.Controls.Add(ALLInfoLayout, 0, 1);
+
+            // Media Info Layout
+            ALLInfoLayout.Controls.Add(CreateMediaInfoLayout(), 0, 0);
+
+            // Books Info Layout
+            ALLInfoLayout.Controls.Add(CreateBooksInfoLayout(), 0, 1);
+
+            // Comics Info Layout
+            ALLInfoLayout.Controls.Add(CreateComicsInfoLayout(), 0, 2);
+
+            mainPanel.Controls.Add(ProfilePanel);
+        }
+        TableLayoutPanel CreateProfileLayout()
+        {
             TableLayoutPanel ProfileLayout = new TableLayoutPanel
             {
                 RowCount = 2,
-                ColumnCount = 2,
+                ColumnCount = 1,
                 Dock = DockStyle.Fill,
                 Margin = new Padding(0)
             };
 
             ProfileLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 200F));
-            ProfileLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 85));
+            ProfileLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 200F));
 
-            ProfileLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
-            ProfileLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-
-            ProfilePanel.Controls.Add(ProfileLayout);
-            ProfileLayout.Controls.Add(createProfilePicture(), 0, 0);
-            ProfileLayout.Controls.Add(createUserInfo(user), 1, 0);
-            Panel MediaPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.LightGray 
-            };
-            ProfilePanel.Controls.Add(MediaPanel);
-
-            mainPanel.Controls.Add(ProfilePanel); 
+            return ProfileLayout;
         }
+        TableLayoutPanel CreateUserInfoLayout()
+        {
+            TableLayoutPanel UserInfoLayout = new TableLayoutPanel
+            {
+                RowCount = 1,
+                ColumnCount = 2,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
 
+            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F)); // For Profile Picture
+            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));   // For User Info
+            return UserInfoLayout;
+        }
+        TableLayoutPanel CreateALLInfoLayout()
+        {
+            TableLayoutPanel ALLInfoLayout = new TableLayoutPanel
+            {
+                RowCount = 3,
+                ColumnCount = 1,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+                BackColor = Color.LightGray
+            };
+
+            ALLInfoLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 33));
+            ALLInfoLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 33));
+            ALLInfoLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 33));
+
+            return ALLInfoLayout;
+        }
+        TableLayoutPanel CreateMediaInfoLayout()
+        {
+            int watched = 70, watching = 10, drop = 8;
+            Color[] colors = { Color.FromArgb(70, 130, 180), Color.FromArgb(121, 169, 207), Color.FromArgb(20, 20, 20) };
+            string[] buttonsText = { "On hold", "Watched", "Watching", "Drop" };
+            return CreateInfoLayout(watched, watching, drop, colors, "Media", buttonsText);
+        }
+        TableLayoutPanel CreateBooksInfoLayout()
+        {
+            int read = 50, reading = 20, abandoned = 5;
+            Color[] colors = { Color.FromArgb(139, 199, 153), Color.FromArgb(185, 237, 172), Color.FromArgb(20, 20, 20) };
+            string[] buttonsText = { "On hold", "Read", "Reading", "Drop" };
+            return CreateInfoLayout(read, reading, abandoned, colors, "Books", buttonsText);
+        }
+        TableLayoutPanel CreateComicsInfoLayout()
+        {
+            int read = 30, reading = 15, abandoned = 10;
+            Color[] colors = { Color.FromArgb(183, 139, 199), Color.FromArgb(237, 172, 217), Color.FromArgb(20, 20, 20) };
+            string[] buttonsText = { "On hold", "Read", "Reading", "Drop" };
+            return CreateInfoLayout(read, reading, abandoned, colors, "Comics", buttonsText);
+        }
+        TableLayoutPanel CreateInfoLayout(int primary, int secondary, int tertiary, Color[] colors, string name, string[] buttonText)
+        {
+            TableLayoutPanel InfoLayout = new TableLayoutPanel
+            {
+                RowCount = 3,
+                ColumnCount = 1,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+            };
+
+            InfoLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+            InfoLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20));
+            InfoLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+
+            Label lineName = new Label
+            {
+                Text = name,
+                Size = new Size(80, 20),
+                Anchor = AnchorStyles.Left | AnchorStyles.Bottom,
+            };
+            InfoLayout.Controls.Add(lineName, 0, 0);
+
+            TableLayoutPanel InfoLineLayout = CreateInfoLineLayout(primary, secondary, tertiary, colors);
+            InfoLayout.Controls.Add(InfoLineLayout, 0, 1);
+
+            TableLayoutPanel ButtonLayout = CreateActionButtons(buttonText);
+            InfoLayout.Controls.Add(ButtonLayout, 0, 2);
+
+
+            return InfoLayout;
+        }
+        TableLayoutPanel CreateActionButtons(string[] buttonText)
+        {
+            TableLayoutPanel buttonLayout = new TableLayoutPanel
+            {
+                RowCount = 1,
+                ColumnCount = 5,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+            };
+            for (int i = 0; i < 4; i++)
+            {
+
+                buttonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
+                Button button = new Button
+                {
+                    Text = buttonText[i],
+                    Size = new Size(100, 20),
+                    BackColor = Color.Transparent,
+                    ForeColor = Color.Black,
+                    FlatStyle = FlatStyle.Flat
+                };
+                button.FlatAppearance.BorderSize = 0;
+
+                button.MouseEnter += (s, e) => button.ForeColor = Color.Orange;
+                button.MouseLeave += (s, e) => button.ForeColor = Color.Black;
+
+                buttonLayout.Controls.Add(button, i, 0);
+            }
+
+            return buttonLayout;
+        }
+        TableLayoutPanel CreateInfoLineLayout(int primary, int secondary, int tertiary, Color[] colors )
+        {
+            int total = primary + secondary + tertiary;
+
+            TableLayoutPanel InfoLineLayout = new TableLayoutPanel
+            {
+                RowCount = 1,
+                ColumnCount = 3,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0),
+            };
+
+            InfoLineLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (primary / (float)total) * 100));
+            InfoLineLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (secondary / (float)total) * 100));
+            InfoLineLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (tertiary / (float)total) * 100));
+
+            InfoLineLayout.Controls.Add(createLabel(primary, colors[0], leftMargin:true), 0, 0);
+            InfoLineLayout.Controls.Add(createLabel(secondary, colors[1]), 1, 0);
+            InfoLineLayout.Controls.Add(createLabel(tertiary, colors[2], rightMargin:true), 2, 0);
+
+            return InfoLineLayout;
+        }
+        private Label createLabel(int num, Color BC, bool leftMargin = false, bool rightMargin = false)
+        {
+            return new Label
+            {
+                Text = num.ToString(),
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = BC,
+                ForeColor = Color.White,
+                Dock = DockStyle.Fill,
+                Margin = new Padding((leftMargin) ? 5 : 0,
+                0,
+                (rightMargin) ? 5 : 0,
+                0)
+            };
+        }
         PictureBox createProfilePicture()
         {
-
-            PictureBox profilePicture = new PictureBox
+            return new PictureBox
             {
                 Size = new Size(200, 200),
-                ImageLocation = "https://ih1.redbubble.net/image.1066412296.0216/fposter,small,wall_texture,product,750x1000.u4.jpg",
+                ImageLocation = "https://pbs.twimg.com/profile_images/1131624264405327873/1YpVVtxD_400x400.jpg",
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BorderStyle = BorderStyle.FixedSingle,
                 Dock = DockStyle.Fill,
                 Margin = new Padding(0)
             };
-
-            return profilePicture;
         }
-
         Panel createUserInfo(User user)
         {
             Panel userInfoPanel = new Panel
@@ -1045,7 +1198,6 @@ namespace MediaNexus
                 BackColor = Color.Transparent
             };
 
-            // Create labels for user information
             Label nameLabel = new Label
             {
                 Text = "USER",
@@ -1073,7 +1225,6 @@ namespace MediaNexus
                 ForeColor = Color.White
             };
 
-            // Add labels to the userInfoPanel
             userInfoPanel.Controls.Add(registrationDateLabel);
             userInfoPanel.Controls.Add(lastVisitLabel);
             userInfoPanel.Controls.Add(nameLabel);
@@ -1081,8 +1232,302 @@ namespace MediaNexus
             return userInfoPanel;
         }
 
+
         #endregion
 
+        #region ProfileSettings
+
+        private void createSettingsPanel(User user)
+        {
+            createNavMenuPanel("Settings");
+            createUserNav(); // Navigation panel
+
+            // Settings Panel configuration
+            int widthSettingsPanel = (int)(mainPanel.Width * 0.75);
+            int heightSettingsPanel = 400;
+            int xPosition = (mainPanel.Width - widthSettingsPanel) / 2;
+            int yPosition = (mainPanel.Height - heightSettingsPanel) / 2;
+
+            ProfileSettingsPanel = new Panel
+            {
+                Size = new Size(widthSettingsPanel, heightSettingsPanel),
+                Location = new Point(xPosition, yPosition),
+                BackColor = Color.White,
+            };
+
+            // Layout configuration
+            TableLayoutPanel ProfileSettingsLayout = CreateProfileSettingLayout();
+            ProfileSettingsPanel.Controls.Add(ProfileSettingsLayout);
+
+            // User Name Row
+            Panel userNamePanel = createUsernameLine(user.Username);
+            ProfileSettingsLayout.Controls.Add(userNamePanel, 0, 0);
+
+            // Second Row: Settings Form
+            TableLayoutPanel SettingsFormLayout = CreateSettingsForm();
+            ProfileSettingsLayout.Controls.Add(SettingsFormLayout, 0, 1);
+
+            mainPanel.Controls.Add(ProfileSettingsPanel);
+        }
+
+        // Creating Layout for the Settings Form
+        private TableLayoutPanel CreateSettingsForm()
+        {
+            // Main layout with two columns
+            TableLayoutPanel settingsFormLayout = new TableLayoutPanel
+            {
+                ColumnCount = 2,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10)
+            };
+
+            // Define column styles: first and second columns
+            settingsFormLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            settingsFormLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+
+            // First Column: Nested TableLayout with 5 rows
+            TableLayoutPanel firstColumnLayout = new TableLayoutPanel
+            {
+                RowCount = 5,
+                Dock = DockStyle.Fill
+            };
+            firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+
+            // Add input fields to first column's nested layout
+            firstColumnLayout.Controls.Add(CreateTextBox("Name", "Enter new name"), 0, 0);
+            firstColumnLayout.Controls.Add(CreateTextBox("Email", "Enter new email"), 0, 1);
+            firstColumnLayout.Controls.Add(CreateTextBox("New Password", "Enter new password", true), 0, 2);
+            firstColumnLayout.Controls.Add(CreateTextBox("Current Password", "Enter current password", true), 0, 3);
+            firstColumnLayout.Controls.Add(CreateThemeButton(), 0, 4);
+
+            settingsFormLayout.Controls.Add(firstColumnLayout, 0, 0);
+
+            // Second Column: Nested TableLayout with 3 rows (first row 50%)
+            TableLayoutPanel secondColumnLayout = new TableLayoutPanel
+            {
+                RowCount = 3,
+                Dock = DockStyle.Fill
+            };
+            secondColumnLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
+            secondColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            secondColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+
+            // Add profile picture and buttons to second column's nested layout
+            PictureBox profilePictureBox = new PictureBox
+            {
+                Size = new Size(200, 200),
+                ImageLocation = "https://ih1.redbubble.net/image.4939897710.6996/fposter,small,wall_texture,square_product,600x600.jpg",
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            secondColumnLayout.Controls.Add(profilePictureBox, 0, 0);
+
+            // Add buttons for image selection and saving
+            secondColumnLayout.Controls.Add(CreateAddImageButton(), 0, 1);
+            secondColumnLayout.Controls.Add(CreateSaveButton(), 0, 2);
+
+            settingsFormLayout.Controls.Add(secondColumnLayout, 1, 0);
+
+            return settingsFormLayout;
+        }
+
+
+        // Helper function for creating text boxes
+        private TextBox CreateTextBox(string placeholder, string toolTipText, bool isPassword = false)
+        {
+            TextBox textBox = new TextBox
+            {
+                Dock = DockStyle.Fill,
+                ForeColor = Color.Gray,
+                Text = placeholder,
+                MaximumSize = new Size(400, 30), // Set max height to 30px
+                PasswordChar = isPassword ? '\0' : '\0' // Do not mask placeholder text
+            };
+
+            ToolTip toolTip = new ToolTip();
+            toolTip.SetToolTip(textBox, toolTipText);
+
+            // Placeholder logic
+            textBox.Enter += (s, e) =>
+            {
+                if (textBox.Text == placeholder)
+                {
+                    textBox.Text = "";
+                    textBox.ForeColor = Color.Black;
+                    if (isPassword)
+                    {
+                        textBox.PasswordChar = '*';
+                    }
+                }
+            };
+
+            textBox.Leave += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    textBox.Text = placeholder;
+                    textBox.ForeColor = Color.Gray;
+                    textBox.PasswordChar = '\0'; // Clear password masking for placeholder
+                }
+            };
+
+            return textBox;
+        }
+
+
+        // Helper function for creating buttons
+        private Button CreateAddImageButton()
+        {
+            Button addImageButton = new Button
+            {
+                Text = "Choose image",  // Use an image symbol like a picture frame emoji
+                Width = 200,
+                Height = 30,
+                BackColor = Color.LightBlue,  // Default color
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(0, 5, 0, 0),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left
+            };
+
+            // Mouse Enter event to change appearance
+            addImageButton.MouseEnter += (s, e) =>
+            {
+                addImageButton.BackColor = Color.DeepSkyBlue; // Change to a darker blue on hover
+            };
+
+            // Mouse Leave event to reset appearance
+            addImageButton.MouseLeave += (s, e) =>
+            {
+                addImageButton.BackColor = Color.LightBlue; // Reset to original color
+            };
+
+            return addImageButton;
+        }
+
+        private Button CreateSaveButton()
+        {
+            Button saveButton = new Button
+            {
+                Text = "Save",
+                Width = 100,
+                Height = 30,
+                BackColor = Color.LightGreen,  // Default color
+                FlatStyle = FlatStyle.Flat,
+                FlatAppearance = { BorderColor = Color.DarkGreen, BorderSize = 2 },
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
+            };
+
+            // Mouse Enter event to change appearance
+            saveButton.MouseEnter += (s, e) =>
+            {
+                saveButton.BackColor = Color.MediumSeaGreen; // Darker green on hover
+            };
+
+            // Mouse Leave event to reset appearance
+            saveButton.MouseLeave += (s, e) =>
+            {
+                saveButton.BackColor = Color.LightGreen; // Reset to original color
+            };
+
+            return saveButton;
+        }
+        private Button CreateThemeButton()
+        {
+            Button themeButton = new Button
+            {
+                Text = "☼",  // Unicode for sun symbol
+                Width = 30,  // Small width for the button
+                Height = 30,
+                TextAlign = ContentAlignment.TopCenter,
+                Margin = new Padding(0),
+                Padding = new Padding(0),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                BackColor = Color.LightGray,  // Default button background color
+                FlatStyle = FlatStyle.Flat,  // Remove button borders for a cleaner look
+                Font = new Font("Arial", 16, FontStyle.Bold),  // Adjust font size for the symbol
+                ForeColor = Color.Orange  // Color of the sun symbol
+            };
+
+            // Add hover effect to change the appearance when the mouse is over the button
+            themeButton.MouseEnter += (s, e) =>
+            {
+                themeButton.BackColor = Color.DarkGray;  // Darken the background on hover
+                themeButton.ForeColor = Color.Yellow;    // Change sun color to yellow on hover
+            };
+
+            themeButton.MouseLeave += (s, e) =>
+            {
+                themeButton.BackColor = Color.LightGray; // Revert to original background
+                themeButton.ForeColor = Color.Orange;    // Revert sun color
+            };
+
+            themeButton.Click += ChangeTheme_Click;  // Hook up the click event handler
+            return themeButton;
+        }
+
+
+        // Dummy click event handlers for buttons
+        private void ChangeTheme_Click(object sender, EventArgs e)
+        {
+            // Change theme logic here
+        }
+
+        private void ChooseImage_Click(object sender, EventArgs e)
+        {
+            // Open file dialog for choosing image
+        }
+
+        private void SaveSettings_Click(object sender, EventArgs e)
+        {
+            // Save settings logic here
+        }
+
+
+        private TableLayoutPanel CreateProfileSettingLayout()
+        {
+            TableLayoutPanel profileSettingLayout = new TableLayoutPanel
+            {
+                RowCount = 2,
+                ColumnCount = 1,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            profileSettingLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            profileSettingLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            profileSettingLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            
+            return profileSettingLayout;
+        }
+
+        private Panel createUsernameLine(string username)
+        {
+            Panel userNamePanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.Gray,
+            };
+
+            Label UserNameLabel = new Label
+            {
+                Text = username,
+                ForeColor = Color.Black,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Dock = DockStyle.Fill,
+                Font = new Font("Arial", 12, FontStyle.Bold)
+            };
+
+            userNamePanel.Controls.Add(UserNameLabel);
+            return userNamePanel;
+        }
+
+
+
+
+        #endregion
 
         private System.Windows.Forms.TableLayoutPanel mainTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel navTableLayoutPanel;
@@ -1107,6 +1552,7 @@ namespace MediaNexus
         private Panel userPanel;
         private Panel userNav;
         private Panel ProfilePanel;
+        private Panel ProfileSettingsPanel;
 
         private TextBox searchTextBox;
 
