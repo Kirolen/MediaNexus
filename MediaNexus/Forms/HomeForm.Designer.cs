@@ -1,4 +1,5 @@
 ﻿using MediaNexus.Class;
+using MediaNexus_Backend;
 using System;
 using System.Data.SqlTypes;
 using System.Drawing;
@@ -14,6 +15,8 @@ namespace MediaNexus
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private int currentMediaCols = 0;
+        private int currentMediaRows = 0;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -341,7 +344,7 @@ namespace MediaNexus
         private void createMainMediaPanel()
         {
             createNavMenuPanel("⌂ Home");
-            if (currentUser.Username != string.Empty) createUserNav();
+            if (currentUser.Username != string.Empty) createUserNav(currentUser.Status);
 
             int widthNewMedia = (int)(mainPanel.Width * 0.75);
             int heightNewMedia = (int)(mainPanel.Height * 0.85);
@@ -458,13 +461,13 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition)
             };
 
-            mediaBlocksTableLayoutPanel = AddRecentMediaBlocks(5, 1);
+            mediaBlocksTableLayoutPanel = AddRecentMediaBlocks(5, 1, 1);
 
             mediaBlocksPanel.Controls.Add(mediaBlocksTableLayoutPanel);
             MediaPanel.Controls.Add(mediaBlocksPanel);
         }
 
-        private TableLayoutPanel AddRecentMediaBlocks(int columnCount, int rowCount)
+        private TableLayoutPanel AddRecentMediaBlocks(int columnCount, int rowCount, int numPage)
         {
             TableLayoutPanel mediaBlocksTableLayoutPanel = new TableLayoutPanel
             {
@@ -474,6 +477,8 @@ namespace MediaNexus
                 Margin = new System.Windows.Forms.Padding(0),
             };
 
+            MediaNexus_Backend.Media[] RecentMedia = MNBackend.GetRecentMedia(columnCount * rowCount, numPage);
+
             for (int i = 0; i < rowCount; i++)
             {
                 mediaBlocksTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / rowCount));
@@ -481,27 +486,27 @@ namespace MediaNexus
                 {
                     mediaBlocksTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / columnCount));
 
-                    Panel mediaBlock = CreateRecentMediaBlock(j.ToString());
-                    if (j == 0) mediaBlock.Margin = new Padding(0, 5, 5, 5);
-                    else if (j == columnCount - 1) mediaBlock.Margin = new Padding(5, 5, 0, 5);
+                    int currentIndex = (i * columnCount) + j;
+                    if (currentIndex >= RecentMedia.Length) continue;
+
+                    Panel mediaBlock = CreateRecentMediaBlock(RecentMedia[currentIndex].MediaId.ToString(), RecentMedia[currentIndex]);
 
                     mediaBlocksTableLayoutPanel.Controls.Add(mediaBlock, j, i);
                 }
             }
-            
 
             return mediaBlocksTableLayoutPanel;
         }
 
-        private Panel CreateRecentMediaBlock(string name)
+        private Panel CreateRecentMediaBlock(string name, Media currentMedia)
         {
             Panel mediaBlock = new Panel()
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.White,
                 Name = $"MediaBlock_{name}",
-                Margin = new System.Windows.Forms.Padding(5)
-                        
+                Margin = new System.Windows.Forms.Padding(5),
+                Tag = currentMedia,
             };
 
             TableLayoutPanel mediaBlockTableLayoutPanel = new TableLayoutPanel
@@ -521,7 +526,7 @@ namespace MediaNexus
             {
                 Dock = DockStyle.Fill,
                 SizeMode = PictureBoxSizeMode.StretchImage,
-                ImageLocation = "https://ih1.redbubble.net/image.1066412296.0216/fposter,small,wall_texture,product,750x1000.u4.jpg",
+                ImageLocation = currentMedia.ImageTitle,
                 Margin = new Padding(0),
                 Cursor = Cursors.Hand,
             };
@@ -531,7 +536,7 @@ namespace MediaNexus
             Label titleLabel = new Label
             {
                 Dock = DockStyle.Fill,
-                Text = "Media Title",
+                Text = currentMedia.OriginalName,
                 TextAlign = ContentAlignment.MiddleLeft,
                 MaximumSize = new Size(mediaBlock.Width, 0),
                 Margin = new Padding(0),
@@ -543,7 +548,7 @@ namespace MediaNexus
             Label studioLabel = new Label
             {
                 Dock = DockStyle.Fill,
-                Text = "Studio/Publisher",
+                Text = currentMedia.Studio,
                 MaximumSize = new Size(mediaBlock.Width, 0),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Margin = new Padding(0),
@@ -715,10 +720,10 @@ namespace MediaNexus
         #endregion
 
         #region media list
-        private void createMediaListPanel(string typeMedia)
+        private void createMediaListPanel(string typeMedia, int page = 1)
         {
             createNavMenuPanel(typeMedia);
-            if (currentUser.Username != string.Empty) createUserNav();
+            if (currentUser.Username != string.Empty) createUserNav(currentUser.Status);
 
 
             int widthMediaListPanel = (int)(mainPanel.Width * 0.75);
@@ -735,40 +740,169 @@ namespace MediaNexus
                 Margin = new Padding(0)
             };
 
-            TableLayoutPanel MediaListTableLayout = new TableLayoutPanel
+            TableLayoutPanel MediaListControlTableLayout = new TableLayoutPanel
             {
                 ColumnCount = 2,
                 Dock = DockStyle.Fill,
+                Margin = new Padding(0)
             };
 
-            MediaListTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80f));
-            MediaListTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20f));
+            MediaListControlTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80f));
+            MediaListControlTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20f));
 
-            MediaPanel.Controls.Add(MediaListTableLayout);
+            MediaPanel.Controls.Add(MediaListControlTableLayout);
 
-            Panel list = new Panel
+            MediaListTableLayout = new TableLayoutPanel
+            {
+                RowCount = 2,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            MediaListTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            MediaListTableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 30f));
+            MediaListControlTableLayout.Controls.Add(MediaListTableLayout);
+
+            mainMediaList = new Panel
             {
                 BackColor = Color.AliceBlue,
                 Dock = DockStyle.Fill
             };
 
-            int minBlockWidth = 150;
-            int minBlockHeight = 200;
+            int minBlockWidth = 110; 
+            int minBlockHeight = 190;
 
-            int countCols = widthMediaListPanel / minBlockWidth;
-            int countRows = heightMediaListPanel / minBlockHeight;
+            currentMediaCols = MediaListTableLayout.Width / minBlockWidth;
+            currentMediaRows = MediaListTableLayout.Height / minBlockHeight;
 
-
-            list.Controls.Add(AddRecentMediaBlocks(countCols, countRows));
-
-            MediaListTableLayout.Controls.Add(list, 0, 0);
+            mainMediaList.Controls.Add(AddRecentMediaBlocks(currentMediaCols, currentMediaRows, page));
+            
+            MediaListTableLayout.Controls.Add(mainMediaList, 0, 0);
+            createPages();
 
             mainPanel.Controls.Add(MediaPanel);
         }
+
+        private int currentPage = 0;
+        private void createPages()
+        {
+            int numMedia = MNBackend.GetMediaCount("media");
+            int numPages = (int)Math.Ceiling((double)numMedia / (currentMediaCols * currentMediaRows));
+
+            int maxButtons = 15; // Максимальна кількість кнопок, яку ми можемо показати (без фіксованих "1" і "останньої")
+            int columnCount = 17;
+
+            pagesTableLayout = new TableLayoutPanel
+            {
+                ColumnCount = columnCount,
+                RowCount = 1,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            float columnPercentage = 100f / columnCount;
+            for (int i = 0; i < columnCount; ++i)
+                pagesTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, columnPercentage));
+
+            // Кнопка лівої стрілки
+            Button leftArrowButton = new Button
+            {
+                Text = "<",
+                BackColor = Color.LightBlue,
+                Dock = DockStyle.Fill,
+                Enabled = currentPage > 1
+            };
+            pagesTableLayout.Controls.Add(leftArrowButton, 0, 0);
+
+            // Динамічна побудова кнопок сторінок
+            if (numPages <= maxButtons) // Якщо сторінок мало, просто показуємо всі
+            {
+                for (int i = 0; i < numPages; i++)
+                {
+                    Button pageButton = CreatePageButton(i + 1, i == currentPage - 1);
+                    pagesTableLayout.Controls.Add(pageButton, i + 1, 0);
+                }
+            }
+            else // Якщо сторінок більше 15
+            {
+                // Додаємо кнопку "1"
+                Button firstPageButton = CreatePageButton(1, currentPage == 1);
+                pagesTableLayout.Controls.Add(firstPageButton, 1, 0);
+
+                // Визначаємо, які кнопки показати залежно від поточної сторінки
+                int startPage = Math.Max(2, currentPage - 6);
+                int endPage = Math.Min(numPages - 1, currentPage + 6);
+
+                // Якщо поточна сторінка ближче до початку
+                if (currentPage <= 7)
+                {
+                    startPage = 2;
+                    endPage = 13;
+                }
+                // Якщо поточна сторінка ближче до кінця
+                else if (currentPage >= numPages - 7)
+                {
+                    startPage = numPages - 12;
+                    endPage = numPages - 1;
+                }
+
+                // Додаємо кнопки від startPage до endPage
+                for (int i = startPage; i <= endPage; i++)
+                {
+                    Button pageButton = CreatePageButton(i, i == currentPage);
+                    pagesTableLayout.Controls.Add(pageButton, i - startPage + 2, 0);
+                }
+
+                // Додаємо кнопку останньої сторінки
+                Button lastPageButton = CreatePageButton(numPages, currentPage == numPages);
+                pagesTableLayout.Controls.Add(lastPageButton, maxButtons, 0);
+            }
+
+            Button rightArrowButton = new Button
+            {
+                Text = ">",
+                Dock = DockStyle.Fill,
+                BackColor = Color.LightBlue,
+                Enabled = currentPage < numPages
+            };
+            pagesTableLayout.Controls.Add(rightArrowButton, columnCount - 1, 0);
+
+            MediaListTableLayout.Controls.Add(pagesTableLayout, 0, 1);
+        }
+
+        private Button CreatePageButton(int pageNumber, bool isCurrent)
+        {
+            Button pageButton = new Button
+            {
+                Text = pageNumber.ToString(),
+                Dock = DockStyle.Fill,
+                BackColor = isCurrent ? Color.LightBlue : Color.White
+            };
+
+            pageButton.Click += (sender, e) =>
+            {
+                mainPanel.Controls.Clear(); 
+                createMediaListPanel("New", pageNumber); 
+            };
+
+            return pageButton;
+        }
+
+
+
+        // Функція для оновлення сторінки
+        //private void UpdatePage()
+        //{
+        //    // Логіка для оновлення контенту сторінки
+        //    // Наприклад, виклик методу для відображення медіа для currentPage
+        //    DisplayMediaForPage(currentPage);
+        //}
+
+
         #endregion
 
         #region user nav
-        private void addUserPanel(string userLogin)
+        private void addUserPanel(User user)
         {
             userPanel = new Panel
             {
@@ -804,7 +938,7 @@ namespace MediaNexus
 
             Label userName = new Label
             {
-                Text = userLogin,
+                Text = user.Username,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Margin = new Padding(0),
                 ForeColor = Color.White,
@@ -830,14 +964,18 @@ namespace MediaNexus
             userPanel.Controls.Add(userLayout);
 
             navTableLayoutPanel.Controls.Add(userPanel, 4, 0);
-            createUserNav();
+            createUserNav(user.Status);
         }
 
-        private void createUserNav()
+        private void createUserNav(string role)
         {
+            bool isAdmin;
+            if (role == "admin" || role == "moderator") isAdmin = true;
+            else isAdmin = false;
+
             userNav = new Panel
             {
-                Size = new Size(140, 180),
+                Size = new Size(140, isAdmin ? 290 : 250),
                 Location = new Point(userPanel.Location.X, userPanel.Location.Y),
                 BackColor = Color.FromArgb(20, 20, 20),
                 Visible = false,
@@ -846,7 +984,7 @@ namespace MediaNexus
 
             TableLayoutPanel userNavLayout = new TableLayoutPanel
             {
-                RowCount = 5,
+                RowCount = isAdmin ? 8 : 7,
                 ColumnCount = 1,
                 Dock = DockStyle.Fill,
                 Margin = new Padding(0)
@@ -858,8 +996,13 @@ namespace MediaNexus
             userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 25F));
+            userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            if (isAdmin)
+                userNavLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
 
-            Label label = new Label
+
+            Label accountLabel = new Label
             {
                 Text = "Account", 
                 TextAlign = ContentAlignment.MiddleLeft,
@@ -869,12 +1012,26 @@ namespace MediaNexus
                 Margin = new Padding(0)
             };
 
-            userNavLayout.Controls.Add(label, 0, 0);
+            userNavLayout.Controls.Add(accountLabel, 0, 0);
 
             userNavLayout.Controls.Add(createUserNavButton("Profile", ProfileButton_Click), 0, 1);
-            userNavLayout.Controls.Add(createUserNavButton("My Media List", ExitButton_Click), 0, 2); //change
+            userNavLayout.Controls.Add(createUserNavButton("My Media List", ExitButton_Click), 0, 2); //need change
             userNavLayout.Controls.Add(createUserNavButton("Settings", ProfileSettingsButton_Click), 0, 3);
             userNavLayout.Controls.Add(createUserNavButton("Exit", ExitButton_Click), 0, 4);
+
+            Label controlLabel = new Label
+            {
+                Text = "Control",
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = Color.White,
+                BackColor = Color.Transparent,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(0)
+            };
+
+            userNavLayout.Controls.Add(controlLabel, 0, 5);
+            userNavLayout.Controls.Add(createUserNavButton("Add media", addButton_Click), 0, 6);
+            if (isAdmin) userNavLayout.Controls.Add(createUserNavButton("Media control", ExitButton_Click), 0, 7);
 
             userNav.Controls.Add(userNavLayout);
             this.mainPanel.Controls.Add(userNav);
@@ -974,7 +1131,7 @@ namespace MediaNexus
         void createProfile(User user)
         {
             createNavMenuPanel("Profile");
-            createUserNav();
+            createUserNav(currentUser.Status);
 
             int widthNewMedia = (int)(mainPanel.Width * 0.75);
             int heightNewMedia = 400;
@@ -1000,13 +1157,8 @@ namespace MediaNexus
             TableLayoutPanel ALLInfoLayout = CreateALLInfoLayout();
             ProfileLayout.Controls.Add(ALLInfoLayout, 0, 1);
 
-            // Media Info Layout
             ALLInfoLayout.Controls.Add(CreateMediaInfoLayout(), 0, 0);
-
-            // Books Info Layout
             ALLInfoLayout.Controls.Add(CreateBooksInfoLayout(), 0, 1);
-
-            // Comics Info Layout
             ALLInfoLayout.Controls.Add(CreateComicsInfoLayout(), 0, 2);
 
             mainPanel.Controls.Add(ProfilePanel);
@@ -1036,8 +1188,8 @@ namespace MediaNexus
                 Margin = new Padding(0)
             };
 
-            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F)); // For Profile Picture
-            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));   // For User Info
+            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F)); 
+            UserInfoLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));   
             return UserInfoLayout;
         }
         TableLayoutPanel CreateALLInfoLayout()
@@ -1240,9 +1392,8 @@ namespace MediaNexus
         private void createSettingsPanel(User user)
         {
             createNavMenuPanel("Settings");
-            createUserNav(); // Navigation panel
+            createUserNav(currentUser.Status); 
 
-            // Settings Panel configuration
             int widthSettingsPanel = (int)(mainPanel.Width * 0.75);
             int heightSettingsPanel = 400;
             int xPosition = (mainPanel.Width - widthSettingsPanel) / 2;
@@ -1255,25 +1406,20 @@ namespace MediaNexus
                 BackColor = Color.White,
             };
 
-            // Layout configuration
             TableLayoutPanel ProfileSettingsLayout = CreateProfileSettingLayout();
             ProfileSettingsPanel.Controls.Add(ProfileSettingsLayout);
 
-            // User Name Row
             Panel userNamePanel = createUsernameLine(user.Username);
             ProfileSettingsLayout.Controls.Add(userNamePanel, 0, 0);
 
-            // Second Row: Settings Form
             TableLayoutPanel SettingsFormLayout = CreateSettingsForm();
             ProfileSettingsLayout.Controls.Add(SettingsFormLayout, 0, 1);
 
             mainPanel.Controls.Add(ProfileSettingsPanel);
         }
 
-        // Creating Layout for the Settings Form
         private TableLayoutPanel CreateSettingsForm()
         {
-            // Main layout with two columns
             TableLayoutPanel settingsFormLayout = new TableLayoutPanel
             {
                 ColumnCount = 2,
@@ -1281,11 +1427,9 @@ namespace MediaNexus
                 Padding = new Padding(10)
             };
 
-            // Define column styles: first and second columns
             settingsFormLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
             settingsFormLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
 
-            // First Column: Nested TableLayout with 5 rows
             TableLayoutPanel firstColumnLayout = new TableLayoutPanel
             {
                 RowCount = 5,
@@ -1297,7 +1441,6 @@ namespace MediaNexus
             firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             firstColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
 
-            // Add input fields to first column's nested layout
             firstColumnLayout.Controls.Add(CreateTextBox("Name", "Enter new name"), 0, 0);
             firstColumnLayout.Controls.Add(CreateTextBox("Email", "Enter new email"), 0, 1);
             firstColumnLayout.Controls.Add(CreateTextBox("New Password", "Enter new password", true), 0, 2);
@@ -1306,7 +1449,6 @@ namespace MediaNexus
 
             settingsFormLayout.Controls.Add(firstColumnLayout, 0, 0);
 
-            // Second Column: Nested TableLayout with 3 rows (first row 50%)
             TableLayoutPanel secondColumnLayout = new TableLayoutPanel
             {
                 RowCount = 3,
@@ -1316,7 +1458,6 @@ namespace MediaNexus
             secondColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             secondColumnLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
 
-            // Add profile picture and buttons to second column's nested layout
             PictureBox profilePictureBox = new PictureBox
             {
                 Size = new Size(200, 200),
@@ -1325,7 +1466,6 @@ namespace MediaNexus
             };
             secondColumnLayout.Controls.Add(profilePictureBox, 0, 0);
 
-            // Add buttons for image selection and saving
             secondColumnLayout.Controls.Add(CreateAddImageButton(), 0, 1);
             secondColumnLayout.Controls.Add(CreateSaveButton(), 0, 2);
 
@@ -1334,8 +1474,6 @@ namespace MediaNexus
             return settingsFormLayout;
         }
 
-
-        // Helper function for creating text boxes
         private TextBox CreateTextBox(string placeholder, string toolTipText, bool isPassword = false)
         {
             TextBox textBox = new TextBox
@@ -1343,14 +1481,13 @@ namespace MediaNexus
                 Dock = DockStyle.Fill,
                 ForeColor = Color.Gray,
                 Text = placeholder,
-                MaximumSize = new Size(400, 30), // Set max height to 30px
-                PasswordChar = isPassword ? '\0' : '\0' // Do not mask placeholder text
+                MaximumSize = new Size(400, 30), 
+                PasswordChar = isPassword ? '\0' : '\0' 
             };
 
             ToolTip toolTip = new ToolTip();
             toolTip.SetToolTip(textBox, toolTipText);
 
-            // Placeholder logic
             textBox.Enter += (s, e) =>
             {
                 if (textBox.Text == placeholder)
@@ -1370,38 +1507,34 @@ namespace MediaNexus
                 {
                     textBox.Text = placeholder;
                     textBox.ForeColor = Color.Gray;
-                    textBox.PasswordChar = '\0'; // Clear password masking for placeholder
+                    textBox.PasswordChar = '\0'; 
                 }
             };
 
             return textBox;
         }
 
-
-        // Helper function for creating buttons
         private Button CreateAddImageButton()
         {
             Button addImageButton = new Button
             {
-                Text = "Choose image",  // Use an image symbol like a picture frame emoji
+                Text = "Choose image",  
                 Width = 200,
                 Height = 30,
-                BackColor = Color.LightBlue,  // Default color
+                BackColor = Color.LightBlue, 
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(0, 5, 0, 0),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left
             };
 
-            // Mouse Enter event to change appearance
             addImageButton.MouseEnter += (s, e) =>
             {
-                addImageButton.BackColor = Color.DeepSkyBlue; // Change to a darker blue on hover
+                addImageButton.BackColor = Color.DeepSkyBlue;
             };
 
-            // Mouse Leave event to reset appearance
             addImageButton.MouseLeave += (s, e) =>
             {
-                addImageButton.BackColor = Color.LightBlue; // Reset to original color
+                addImageButton.BackColor = Color.LightBlue; 
             };
 
             return addImageButton;
@@ -1414,22 +1547,20 @@ namespace MediaNexus
                 Text = "Save",
                 Width = 100,
                 Height = 30,
-                BackColor = Color.LightGreen,  // Default color
+                BackColor = Color.LightGreen,  
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderColor = Color.DarkGreen, BorderSize = 2 },
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
 
-            // Mouse Enter event to change appearance
             saveButton.MouseEnter += (s, e) =>
             {
-                saveButton.BackColor = Color.MediumSeaGreen; // Darker green on hover
+                saveButton.BackColor = Color.MediumSeaGreen; 
             };
 
-            // Mouse Leave event to reset appearance
             saveButton.MouseLeave += (s, e) =>
             {
-                saveButton.BackColor = Color.LightGreen; // Reset to original color
+                saveButton.BackColor = Color.LightGreen; 
             };
 
             return saveButton;
@@ -1438,53 +1569,34 @@ namespace MediaNexus
         {
             Button themeButton = new Button
             {
-                Text = "☼",  // Unicode for sun symbol
-                Width = 30,  // Small width for the button
+                Text = "☼",  
+                Width = 30,  
                 Height = 30,
                 TextAlign = ContentAlignment.TopCenter,
                 Margin = new Padding(0),
                 Padding = new Padding(0),
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
-                BackColor = Color.LightGray,  // Default button background color
-                FlatStyle = FlatStyle.Flat,  // Remove button borders for a cleaner look
-                Font = new Font("Arial", 16, FontStyle.Bold),  // Adjust font size for the symbol
-                ForeColor = Color.Orange  // Color of the sun symbol
+                BackColor = Color.LightGray,  
+                FlatStyle = FlatStyle.Flat,  
+                Font = new Font("Arial", 16, FontStyle.Bold), 
+                ForeColor = Color.Orange 
             };
 
-            // Add hover effect to change the appearance when the mouse is over the button
             themeButton.MouseEnter += (s, e) =>
             {
-                themeButton.BackColor = Color.DarkGray;  // Darken the background on hover
-                themeButton.ForeColor = Color.Yellow;    // Change sun color to yellow on hover
+                themeButton.BackColor = Color.DarkGray;  
+                themeButton.ForeColor = Color.Yellow;   
             };
 
             themeButton.MouseLeave += (s, e) =>
             {
-                themeButton.BackColor = Color.LightGray; // Revert to original background
-                themeButton.ForeColor = Color.Orange;    // Revert sun color
+                themeButton.BackColor = Color.LightGray; 
+                themeButton.ForeColor = Color.Orange;    
             };
 
-            themeButton.Click += ChangeTheme_Click;  // Hook up the click event handler
+            themeButton.Click += ChangeTheme_Click;  
             return themeButton;
         }
-
-
-        // Dummy click event handlers for buttons
-        private void ChangeTheme_Click(object sender, EventArgs e)
-        {
-            // Change theme logic here
-        }
-
-        private void ChooseImage_Click(object sender, EventArgs e)
-        {
-            // Open file dialog for choosing image
-        }
-
-        private void SaveSettings_Click(object sender, EventArgs e)
-        {
-            // Save settings logic here
-        }
-
 
         private TableLayoutPanel CreateProfileSettingLayout()
         {
@@ -1532,6 +1644,9 @@ namespace MediaNexus
         private System.Windows.Forms.TableLayoutPanel mainTableLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel navTableLayoutPanel;
         private TableLayoutPanel navTableLayout;
+        private TableLayoutPanel MediaListTableLayout;
+        private TableLayoutPanel pagesTableLayout;
+
 
         private Label navNameLabel;
         private Label navLabel_base;
@@ -1553,6 +1668,7 @@ namespace MediaNexus
         private Panel userNav;
         private Panel ProfilePanel;
         private Panel ProfileSettingsPanel;
+        private Panel mainMediaList;
 
         private TextBox searchTextBox;
 

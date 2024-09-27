@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using System.Globalization;
 
 namespace MediaNexus
 {
@@ -45,6 +46,7 @@ namespace MediaNexus
             UserPanelLocation();
             ProfilePanelResize();
             ProfileSettingsPanelResize();
+            ListPanel_Resize();
         }
 
         private void navMenuResize()
@@ -146,6 +148,26 @@ namespace MediaNexus
             if (userNav != null && userPanel != null) userNav.Location = new Point(userPanel.Location.X, userPanel.Location.Y);
         }
 
+        private void ListPanel_Resize()
+        {
+            if (mainMediaList != null && MediaListTableLayout != null)
+            {
+                int minBlockWidth = 110;
+                int minBlockHeight = 190;
+
+                int countCols = MediaListTableLayout.Width / minBlockWidth;
+                int countRows = MediaListTableLayout.Height / minBlockHeight;
+
+                if (currentMediaRows != countRows || currentMediaCols != countCols)
+                {
+                    currentMediaRows = countRows;
+                    currentMediaCols = countCols;
+                    mainMediaList.Controls.Clear();
+                    mainMediaList.Controls.Add(AddRecentMediaBlocks(countCols, countRows, 1));
+                }
+            }
+        }
+
         #endregion
 
         #region Event: button click
@@ -153,7 +175,6 @@ namespace MediaNexus
         {
             navMenuPanel.Visible = !navMenuPanel.Visible;
         }
-
         private void userPanel_Click(object sender, EventArgs e)
         {
             userNav.Visible = !userNav.Visible;
@@ -167,7 +188,7 @@ namespace MediaNexus
                 currentUser = loginForm.LoggedInUser;
                 MessageBox.Show($"Welcome, {currentUser.Username}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 navTableLayoutPanel.Controls.RemoveAt(4);
-                addUserPanel(currentUser.Username);
+                addUserPanel(currentUser);
             }
         }
         private void navButton_type_Click(object sender, EventArgs e)
@@ -220,6 +241,26 @@ namespace MediaNexus
             createSettingsPanel(currentUser);
         }
 
+        private void addButton_Click(object sender, EventArgs e)
+        {
+            AddingForm adding = new AddingForm("media");
+            adding.ShowDialog();
+        }
+
+
+        private void ChangeTheme_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void ChooseImage_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void SaveSettings_Click(object sender, EventArgs e)
+        {
+        }
+
+
         #endregion
 
         #region Enter/Leave events
@@ -267,20 +308,24 @@ namespace MediaNexus
         }
         #endregion
 
+        #region logic
         public void checkFastVerification()
         {
             string ul = Properties.Settings.Default.login;
             string up = Properties.Settings.Default.password;
             if (ul != null && MNBackend.CheckLogin(ul, up))
             {
-                currentUser = new User(ul, up, "User");
-                addUserPanel(currentUser.Username);
+                currentUser = new User(ul, up, "user");
+                addUserPanel(currentUser);
             }
-            else {
+            else
+            {
                 navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
             }
         }
+        #endregion
 
-      
+
+
     }
 }
