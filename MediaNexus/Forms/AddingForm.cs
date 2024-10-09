@@ -1,20 +1,16 @@
 ﻿using MediaNexus_Backend;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
-namespace MediaNexus.Forms
+namespace MediaNexus
 {
     public partial class AddingForm : Form
     {
-        public AddingForm(string type)
+        readonly MainMediaType mainMediaType;
+        readonly int userId;
+
+        public AddingForm(string type, MainMediaType mediaType, int id = 0)
         {
             InitializeComponent();
 
@@ -22,75 +18,122 @@ namespace MediaNexus.Forms
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
+            userId = id;
+            mainMediaType = mediaType;
 
             if (type == "media") createAddMediaPanel();
+            else if (type == "book") createAddBookPanel();
         }
 
         private void AddMediaButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Media newMedia = new Media
-                {
-                    OriginalName = string.IsNullOrWhiteSpace(originalNameTextBox.Text) ? null : originalNameTextBox.Text,
-                    EnglishName = string.IsNullOrWhiteSpace(englishNameTextBox.Text) ? null : englishNameTextBox.Text,
-                    ImageTitle = string.IsNullOrWhiteSpace(imageUrlTextBox.Text) ? null : imageUrlTextBox.Text,
-                    MediaType = (mediaTypeComboBox.SelectedIndex > 0) ? (MediaTypeEnum)(mediaTypeComboBox.SelectedIndex) : (MediaTypeEnum)(0),
-                    ReleaseDate = releaseDatePicker.Value,
-                    Studio = string.IsNullOrWhiteSpace(studioTextBox.Text) ? null : studioTextBox.Text,
-                    Description = string.IsNullOrWhiteSpace(descriptionTextBox.Text) ? null : descriptionTextBox.Text,
-                    Rating = (ratingComboBox.SelectedIndex > 0) ? (RatingEnum)(ratingComboBox.SelectedIndex) : (RatingEnum)(0),
-                    Status = (statusComboBox.SelectedIndex > 0) ? (StatusEnum)(statusComboBox.SelectedIndex) : (StatusEnum)(0),
-                    EpisodeDuration = TimeSpan.TryParse(episodeDurationTextBox.Text, out TimeSpan episodeDuration) ? episodeDuration : TimeSpan.Zero,
-                    TotalEpisodes = int.TryParse(totalEpisodesTextBox.Text, out int totalEpisodes) ? totalEpisodes : 0,
-                    ReleasedEpisodes = int.TryParse(releasedEpisodesTextBox.Text, out int releasedEpisodes) ? releasedEpisodes : 0,
-                    NextEpisode = nextEpisodeDatePicker.Value > DateTime.Now ? nextEpisodeDatePicker.Value : (DateTime?)null,
-                    TimeUntilNextEpisode = ConvertToSeconds(timeUntilNextEpisodeTextBox.Text)
-                };
+            AddMedia();
+        }
 
-                List<Genres> selectedGenres = new List<Genres>();
-                foreach (Control control in genresPanel.Controls)
+        private void AddBookButton_Click(object sender, EventArgs e)
+        {
+            AddBook();
+        }
+
+        private void AddMedia()
+        {
+            if (string.IsNullOrEmpty(originalName.Text) || string.IsNullOrEmpty(englishName.Text))
+            {
+                MessageBox.Show("Original and English names are required.");
+                return;
+            }
+
+            Media newMedia = new Media
+            {
+                MainType = mainMediaType,
+                OriginalName = originalName.Text,
+                EnglishName = englishName.Text,
+                ImageURL = imageUrlTextBox.Text,
+                Status = (status.SelectedIndex > 0) ? (MediaStatus)(status.SelectedIndex) : (MediaStatus)(0),
+                PG_Rating = (pg_rating.SelectedIndex > 0) ? (PG_Rating)(pg_rating.SelectedIndex) : (PG_Rating)(0),
+                Description = descriptionTextBox.Text,
+                IDUserWhoAdded = userId,
+                TimeAdded = DateTime.Now,
+                SecondMediaType = (mediaType.SelectedIndex > 0) ? (MediaType)(mediaType.SelectedIndex) : (MediaType)(0),
+                Studio = studio.Text,
+                TotalEpisodes = int.TryParse(totalEpisode.Text, out int totalEps) ? totalEps : 0,
+                ReleasedEpisode = int.TryParse(realesedEpisode.Text, out int releasedEps) ? releasedEps : 0,
+                EpisodeDuration = int.TryParse(episodeDuration.Text, out int duration) ? duration : 0,
+                TimeUntilNewEpisodeInSeconds = ConvertToSeconds(timeUntilNewEpisodeInSeconds.Text),
+                NextEpisodeDateTime = nextEpisodeDate?.GetSelectedDateTime(),
+                StartDate = startDatePicker?.GetSelectedDate(),
+                EndDate = endDatePicker?.GetSelectedDate(),
+            };
+
+            Genres[] genres = GetSelectedGenres();
+            MediaService.AddMediaToDatabase(newMedia, genres);
+            this.Close();
+        }
+        private void AddBook()
+        {
+            if (string.IsNullOrEmpty(originalName.Text) || string.IsNullOrEmpty(englishName.Text))
+            {
+                MessageBox.Show("Original and English names are required.");
+                return;
+            }
+
+            Book newBook = new Book
+            {
+                MainType = mainMediaType,
+                OriginalName = originalName.Text,
+                EnglishName = englishName.Text,
+                ImageURL = imageUrlTextBox.Text,
+                Status = (status.SelectedIndex > 0) ? (MediaStatus)(status.SelectedIndex) : (MediaStatus)(0),
+                PG_Rating = (pg_rating.SelectedIndex > 0) ? (PG_Rating)(pg_rating.SelectedIndex) : (PG_Rating)(0),
+                Description = descriptionTextBox.Text,
+                IDUserWhoAdded = userId,
+                TimeAdded = DateTime.Now,
+                Author = AuthorBox.Text,
+                PublicationDate = endDatePicker?.GetSelectedDate(),
+                Pages = int.TryParse(PagesBox.Text, out int duration) ? duration : 0,
+                ISBN = ISBN_Box.Text,
+            };
+
+            Genres[] genres = GetSelectedGenres();
+            MediaService.AddBookToDatabase(newBook, genres);
+            this.Close();
+        }
+
+        private Genres[] GetSelectedGenres()
+        {
+            List<Genres> selectedGenres = new List<Genres>();
+
+            foreach (Control control in genresPanel.Controls)
+            {
+                if (control is ComboBox genreComboBox)
                 {
-                    if (control is ComboBox genreComboBox && genreComboBox.SelectedIndex > 0) 
+                    if (genreComboBox.SelectedIndex > 0)
                     {
-                        Genres selectedGenre = genreComboBox.SelectedItem as Genres;
-                        if (selectedGenre != null)
-                        {
-                            selectedGenres.Add(selectedGenre);
-                        }
+                        selectedGenres.Add((Genres)genreComboBox.SelectedItem);
                     }
                 }
-
-                Genres[] genresArray = selectedGenres.ToArray();
-
-
-                MNBackend.addMedia(genresArray, newMedia);
-                MessageBox.Show("Media successfully added!");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error adding media: {ex.Message}");
-            }
+
+            return selectedGenres.ToArray();
         }
+
         public int ConvertToSeconds(string time)
         {
-            // Спочатку розділяємо рядок по символу ":"
+            if (string.IsNullOrEmpty(time)) return 0;
+
             string[] timeParts = time.Split(':');
 
             if (timeParts.Length != 3)
             {
-                throw new FormatException("Неправильний формат часу. Очікується формат HH:mm:ss.");
+                return 0;
             }
 
-            // Парсимо години, хвилини і секунди
             int hours = int.Parse(timeParts[0]);
             int minutes = int.Parse(timeParts[1]);
             int seconds = int.Parse(timeParts[2]);
-
-            // Створюємо об'єкт TimeSpan
+ 
             TimeSpan timeSpan = new TimeSpan(hours, minutes, seconds);
 
-            // Повертаємо загальну кількість секунд
             return (int)timeSpan.TotalSeconds;
         }
     }

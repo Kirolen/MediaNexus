@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using MediaNexus_Backend;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using MediaNexus.Class;
-using MediaNexus_Backend;
 
-
-namespace MediaNexus.Forms
+namespace MediaNexus
 {
     public partial class LoginForm : Form
     {
@@ -22,7 +14,7 @@ namespace MediaNexus.Forms
             InitializeComponent();
         }
 
-        private void textBoxUsername_Enter(object sender, EventArgs e)
+        private void TextBoxUsername_Enter(object sender, EventArgs e)
         {
             if (textBoxUsername.Text == "Username")
             {
@@ -31,7 +23,7 @@ namespace MediaNexus.Forms
             }
         }
 
-        private void textBoxUsername_Leave(object sender, EventArgs e)
+        private void TextBoxUsername_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBoxUsername.Text))
             {
@@ -40,44 +32,43 @@ namespace MediaNexus.Forms
             }
         }
 
-        private void textBoxPassword_Enter(object sender, EventArgs e)
+        private void TextBoxPassword_Enter(object sender, EventArgs e)
         {
             if (textBoxPassword.Text == "Password")
             {
                 textBoxPassword.Text = "";
-                textBoxPassword.UseSystemPasswordChar = true;  
+                textBoxPassword.UseSystemPasswordChar = true;
                 textBoxPassword.ForeColor = Color.White;
             }
         }
 
-        private void textBoxPassword_Leave(object sender, EventArgs e)
+        private void TextBoxPassword_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBoxPassword.Text))
             {
                 textBoxPassword.Text = "Password";
-                textBoxPassword.UseSystemPasswordChar = false; 
+                textBoxPassword.UseSystemPasswordChar = false;
                 textBoxPassword.ForeColor = Color.Gray;
             }
         }
 
-        private void buttonLogin_Click(object sender, EventArgs e)
+        private void ButtonLogin_Click(object sender, EventArgs e)
         {
             string loginUser = textBoxUsername.Text;
             string passUser = textBoxPassword.Text;
 
-            bool verificationSuccessful = MNBackend.CheckLogin(loginUser, passUser);
+            LoggedInUser = MediaService.CheckLogin(loginUser, passUser);
 
-            if (verificationSuccessful)
+            if (LoggedInUser.Role != UserRole.Guest)
             {
                 if (checkBoxRememberMe.Checked)
                 {
-                    Properties.Settings.Default.login = loginUser;
-                    Properties.Settings.Default.password = passUser;
-                    Properties.Settings.Default.Save(); 
+                    Properties.Settings.Default.savedLogin = loginUser;
+                    Properties.Settings.Default.savedPassword = passUser;
+                    Properties.Settings.Default.Save();
                 }
 
-                LoggedInUser = new User(loginUser, passUser, "User"); 
-                this.DialogResult = DialogResult.OK; 
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
@@ -86,7 +77,7 @@ namespace MediaNexus.Forms
             }
         }
 
-        private void buttonRegister_Click(object sender, EventArgs e)
+        private void ButtonRegister_Click(object sender, EventArgs e)
         {
             this.Close();
             RegisterForm regForm = new RegisterForm();

@@ -1,12 +1,9 @@
-﻿using System;
+﻿using MediaNexus_Backend;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Security.Cryptography;
-using System.Text;
-using MediaNexus_Backend;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
-namespace MediaNexus.Forms
+namespace MediaNexus
 {
     public partial class RegisterForm : Form
     {
@@ -16,15 +13,15 @@ namespace MediaNexus.Forms
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
         }
-        
+
         #region Event: button click
         private void buttonRegister_Click(object sender, EventArgs e)
         {
             string userLogin = textBoxUsername.Text;
             string password = textBoxPassword.Text;
             string email = textBoxEmail.Text;
-          
-            RegisterResult isRegistered = MNBackend.Register(userLogin, password, email);
+
+            RegisterResult isRegistered = MediaService.Register(userLogin, password, email);
 
             if (isRegistered == RegisterResult.Success)
             {
@@ -103,6 +100,5 @@ namespace MediaNexus.Forms
             }
         }
         #endregion
-
     }
 }

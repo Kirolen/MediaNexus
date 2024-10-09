@@ -36,6 +36,9 @@
     <Reference Include="MediaNexus_Backend">
       <HintPath>C:\Users\Lenovo\source\repos\MediaNexus_Backend\MediaNexus_Backend\obj\Debug\MediaNexus_Backend.dll</HintPath>
     </Reference>
+    <Reference Include="MN_Backend">
+      <HintPath>C:\Users\Lenovo\source\repos\MN_Backend\MN_Backend\obj\Debug\MN_Backend.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=9.0.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\MySQL\MySQL Connector NET 9.0\MySql.Data.dll</HintPath>
@@ -53,7 +56,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class\User.cs" />
+    <Compile Include="Class\Components.cs" />
+    <Compile Include="Class\DatePickerPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Class\DateTimePickerPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\AddingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,15 +89,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Forms\HomeForm.resx">
-      <DependentUpon>HomeForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\RegisterForm.resx">
-      <DependentUpon>RegisterForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

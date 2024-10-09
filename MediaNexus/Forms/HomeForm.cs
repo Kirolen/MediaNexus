@@ -1,36 +1,27 @@
-﻿using MediaNexus.Class;
-using MediaNexus_Backend;
-using MediaNexus.Forms;
+﻿using MediaNexus_Backend;
 using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using System.Globalization;
 
 namespace MediaNexus
 {
     public partial class HomeForm : Form
     {
-        private delegate void ButtonClickHandler(object sender, EventArgs e);
-        private User currentUser = new User();
-
+        User currentUser;
         public HomeForm()
         {
             InitializeComponent();
             this.Resize += new EventHandler(HomeForm_Resize);
             this.MinimumSize = new Size(800, 600);
-            
-            createMainMediaPanel();
-            //Properties.Settings.Default.login = "";
-            //Properties.Settings.Default.password = "";
-            //Properties.Settings.Default.Save();
-            checkFastVerification();
 
+            createMainMediaPanel();
+            Verification();
         }
 
 
-        #region resizing
-        // Event handler for form resizing
+        #region Resizing
         private void HomeForm_Resize(object sender, EventArgs e)
         {
             ResizeControls();
@@ -41,18 +32,18 @@ namespace MediaNexus
             mainTableLayoutPanel.Size = this.ClientSize;
             navTableLayoutPanel.Width = this.ClientSize.Width;
 
-            navMenuResize();
+            NavMenuResize();
             RecentMediaPanelResize();
             UserPanelLocation();
-            ProfilePanelResize();
             ProfileSettingsPanelResize();
-            ListPanel_Resize();
         }
-
-        private void navMenuResize()
+        private void NavMenuResize()
         {
-            navMenuPanel.Size = new Size(navButton.Width, 160);
-            navMenuPanel.Location = new Point(navButton.Location.X, navButton.Location.Y);
+            if (navMenuPanel != null)
+            {
+                navMenuPanel.Size = new Size(navButton.Width, 200);
+                navMenuPanel.Location = new Point(navButton.Location.X, navButton.Location.Y);
+            }
         }
         private void RecentMediaPanelResize()
         {
@@ -67,7 +58,7 @@ namespace MediaNexus
                 MediaPanel.Size = new Size(widthNewMedia, heightNewMedia);
                 MediaPanel.Location = new Point(xPosition, yPosition);
 
-                gtnmButtonResize();
+                GoToNewMediaButtonResize();
                 RecentMediaPanelElementsResize();
             }
         }
@@ -75,7 +66,7 @@ namespace MediaNexus
         {
             if (MediaPanel != null && mediaBlocksPanel != null && mediaHistoryAndNavPanel != null)
             {
-                int widthPanel = MediaPanel.Width;
+                int widthPanel = (int)(MediaPanel.Width * 0.95);
                 int heightBlocksPanel = (int)(MediaPanel.Height * 0.6);
                 int heightHAVPanel = (int)(MediaPanel.Height * 0.2);
 
@@ -84,53 +75,20 @@ namespace MediaNexus
 
                 mediaBlocksPanel.Location = new Point(
                     (MediaPanel.Width - widthPanel) / 2,
-                    60 
+                    60
                 );
 
                 mediaHistoryAndNavPanel.Location = new Point(
                     (MediaPanel.Width - widthPanel) / 2,
-                    mediaBlocksPanel.Bottom + 10 
+                    mediaBlocksPanel.Bottom + 10
                 );
             }
         }
-        private void ProfilePanelResize()
-        {
-            if (ProfilePanel != null)
-            {
-                int widthNewMedia = (int)(mainPanel.Width * 0.75);
-                int heightNewMedia = ProfilePanel.Height;
-
-                if (widthNewMedia > 800) widthNewMedia = 880;
-
-                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
-                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
-                
-                ProfilePanel.Size = new Size(widthNewMedia, heightNewMedia);
-                ProfilePanel.Location = new Point(xPosition, yPosition);
-            }
-        }
-
-        private void ProfileSettingsPanelResize()
-        {
-            if (ProfileSettingsPanel != null)
-            {
-                int widthNewMedia = (int)(mainPanel.Width * 0.75);
-                int heightNewMedia = ProfileSettingsPanel.Height;
-
-                if (widthNewMedia > 800) widthNewMedia = 880;
-
-                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
-                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
-
-                ProfileSettingsPanel.Size = new Size(widthNewMedia, heightNewMedia);
-                ProfileSettingsPanel.Location = new Point(xPosition, yPosition);
-            }
-        }
-        private void gtnmButtonResize()
+        private void GoToNewMediaButtonResize()
         {
             if (MediaPanel != null)
             {
-                int widthButton = MediaPanel.Width;
+                int widthButton = (int)(MediaPanel.Width * 0.95);
                 int heightButton = 25;
 
                 if (goToNewMediaButton != null)
@@ -147,90 +105,154 @@ namespace MediaNexus
         {
             if (userNav != null && userPanel != null) userNav.Location = new Point(userPanel.Location.X, userPanel.Location.Y);
         }
-
-        private void ListPanel_Resize()
+        private void ProfileSettingsPanelResize()
         {
-            if (mainMediaList != null && MediaListTableLayout != null)
+            if (ProfileSettingsPanel != null)
             {
-                int minBlockWidth = 110;
-                int minBlockHeight = 190;
+                int widthNewMedia = (int)(mainPanel.Width * 0.75);
+                int heightNewMedia = ProfileSettingsPanel.Height;
 
-                int countCols = MediaListTableLayout.Width / minBlockWidth;
-                int countRows = MediaListTableLayout.Height / minBlockHeight;
+                if (widthNewMedia > 800) widthNewMedia = 880;
 
-                if (currentMediaRows != countRows || currentMediaCols != countCols)
-                {
-                    currentMediaRows = countRows;
-                    currentMediaCols = countCols;
-                    mainMediaList.Controls.Clear();
-                    mainMediaList.Controls.Add(AddRecentMediaBlocks(countCols, countRows, 1));
-                }
+                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+
+                ProfileSettingsPanel.Size = new Size(widthNewMedia, heightNewMedia);
+                ProfileSettingsPanel.Location = new Point(xPosition, yPosition);
             }
         }
+        #endregion
+
+
+
+        #region resizing
+
+        //private void ProfilePanelResize()
+        //{
+        //    if (ProfilePanel != null)
+        //    {
+        //        int widthNewMedia = (int)(mainPanel.Width * 0.75);
+        //        int heightNewMedia = ProfilePanel.Height;
+
+        //        if (widthNewMedia > 800) widthNewMedia = 880;
+
+        //        int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+        //        int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+
+        //        ProfilePanel.Size = new Size(widthNewMedia, heightNewMedia);
+        //        ProfilePanel.Location = new Point(xPosition, yPosition);
+        //    }
+        //}
+
+
+
+        
+
+        //private void ListPanel_Resize()
+        //{
+        //    if (mainMediaList != null && MediaListTableLayout != null)
+        //    {
+        //        int minBlockWidth = 110;
+        //        int minBlockHeight = 190;
+
+        //        int countCols = MediaListTableLayout.Width / minBlockWidth;
+        //        int countRows = MediaListTableLayout.Height / minBlockHeight;
+
+        //        if (currentMediaRows != countRows || currentMediaCols != countCols)
+        //        {
+        //            currentMediaRows = countRows;
+        //            currentMediaCols = countCols;
+        //            mainMediaList.Controls.Clear();
+        //            mainMediaList.Controls.Add(AddRecentMediaBlocks(countCols, countRows, 1));
+        //        }
+        //    }
+        //}
 
         #endregion
 
-        #region Event: button click
-        private void navButton_Click(object sender, EventArgs e)
+
+        #region Click
+        private void NavButton_Click(object sender, EventArgs e)
         {
+            if (navMenuPanel == null) createNavMenuPanel();
+            if (!mainPanel.Controls.Contains(navMenuPanel))
+            {
+                mainPanel.Controls.Add(navMenuPanel);
+                navMenuPanel.Visible = false;
+                navMenuPanel.BringToFront();
+            }
+
             navMenuPanel.Visible = !navMenuPanel.Visible;
         }
-        private void userPanel_Click(object sender, EventArgs e)
+
+        private void NavButton_type_Click(object sender, EventArgs e)
         {
-            userNav.Visible = !userNav.Visible;
-            
+            mainPanel.Controls.Clear();
+
+
+            Button clickedButton = sender as Button;
+
+            if (clickedButton.Name == "navButton_media") ChangeNavLabelText("Media");
+            else if (clickedButton.Name == "navButton_comics") ChangeNavLabelText("Comics");
+            else if (clickedButton.Name == "navButton_book") ChangeNavLabelText("Books");
+            else if (clickedButton.Name == "navButton_games") ChangeNavLabelText("Games");
+
+            createMediaListPanel();
         }
-        private void loginButton_Click(object sender, EventArgs e)
+
+        private void NavNameLabel_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            ChangeNavLabelText("⌂ Home");
+            createMainMediaPanel();
+        }
+
+        private void GoToNewMedia_button_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+            ChangeNavLabelText("New");
+            createMediaListPanel();    
+        }
+        private void LoginButton_Click(object sender, EventArgs e)
         {
             LoginForm loginForm = new LoginForm();
             if (loginForm.ShowDialog() == DialogResult.OK)
             {
                 currentUser = loginForm.LoggedInUser;
-                MessageBox.Show($"Welcome, {currentUser.Username}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Welcome, {currentUser.Nickname}!", "Login Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 navTableLayoutPanel.Controls.RemoveAt(4);
                 addUserPanel(currentUser);
             }
         }
-        private void navButton_type_Click(object sender, EventArgs e)
+
+        private void UserPanel_Click(object sender, EventArgs e)
         {
-            mainPanel.Controls.Clear();
+            if (userNav == null) createUserNav(currentUser.Role.ToString()); 
+            if (!mainPanel.Controls.Contains(userNav))
+            {
+                mainPanel.Controls.Add(userNav);
+                userNav.Visible = false;
+                userNav.BringToFront();
+            }
 
-            string mediaType = "";
-
-            Button clickedButton = sender as Button;
-
-            if (clickedButton == navButton_media) mediaType = "Media";
-            else if (clickedButton == navButton_comics) mediaType = "Comics";
-            else if (clickedButton == navButton_book) mediaType = "Books";
-
-            createMediaListPanel(mediaType);
-        }
-        private void goToNewMedia_button_Click(object sender, EventArgs e)
-        {
-            mainPanel.Controls.Clear();
-            createMediaListPanel("New");
-        }
-
-        private void navNameLabel_Click(object sender, EventArgs e)
-        {
-            mainPanel.Controls.Clear();
-            createMainMediaPanel();
+            
+            userNav.Visible = !userNav.Visible;
         }
 
         private void ProfileButton_Click(object sender, EventArgs e)
         {
-            mainPanel.Controls.Clear();
-            createProfile(currentUser);
+            //mainPanel.Controls.Clear();
+            //createProfile(currentUser);
         }
-
         private void ExitButton_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
             navTableLayoutPanel.Controls.RemoveAt(4);
             currentUser = new User();
-            Properties.Settings.Default.login = "";
-            Properties.Settings.Default.password = "";
+            Properties.Settings.Default.savedLogin = "";
+            Properties.Settings.Default.savedPassword = "";
             Properties.Settings.Default.Save();
+            if (loginButton == null) createLoginButton();
             navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
             createMainMediaPanel();
         }
@@ -238,94 +260,105 @@ namespace MediaNexus
         private void ProfileSettingsButton_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
+            ChangeNavLabelText("New");
             createSettingsPanel(currentUser);
         }
 
-        private void addButton_Click(object sender, EventArgs e)
+        private void AddButton_Click(string type)
         {
-            AddingForm adding = new AddingForm("media");
+            MainMediaType mediaType = MainMediaType.Media;
+            if (type == "book") mediaType = MainMediaType.Book;
+
+            AddingForm adding = new AddingForm(type, mediaType, currentUser.Id);
             adding.ShowDialog();
         }
 
-
-        private void ChangeTheme_Click(object sender, EventArgs e)
+        private void SaveUserSettingsButton_Click()
         {
+            User newInfoCuurrentUser = new User(currentUser);
+
+            if (!string.IsNullOrEmpty(SettingNickname.Text)) newInfoCuurrentUser.Nickname = SettingNickname.Text;
+            if (!string.IsNullOrEmpty(SettingEmail.Text)) newInfoCuurrentUser.Email = SettingEmail.Text;
+            if (!string.IsNullOrEmpty(Description.Text)) newInfoCuurrentUser.UserDescription = Description.Text;
+            if (!string.IsNullOrEmpty(imageUrl.Text)) newInfoCuurrentUser.UserImageURL = imageUrl.Text;
+            if (birthdayPicker.GetSelectedDate() != null) newInfoCuurrentUser.BirthdayDate = birthdayPicker.GetSelectedDate();
+
+            string currentPasswword = SettingCurrentPassword.Text;
+            string newPasswword = SettingNewPassword.Text;
+
+            MediaService.ChangeUserInfo(newInfoCuurrentUser, currentPasswword, newPasswword);
         }
-
-        private void ChooseImage_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void SaveSettings_Click(object sender, EventArgs e)
-        {
-        }
-
-
         #endregion
 
+
         #region Enter/Leave events
-        private void changeButtonForeColor(Label button, Color newColor)
+        [DebuggerStepThrough]
+        private void ChangeButtonForeColor(Label button, Color newColor)
         {
             if (button != null) button.ForeColor = newColor;
         }
 
-        private void navButton_MouseEnter(object sender, EventArgs e)
+        [DebuggerStepThrough]
+        private void NavButton_MouseEnter(object sender, EventArgs e)
         {
-            Button navButton = sender as Button;
-
-            if (navButton != null)
+            if (sender is Button navButton)
             {
                 navButton.BackColor = Color.White;
                 navButton.ForeColor = Color.Black;
             }
         }
-        private void navButton_MouseLeave(object sender, EventArgs e)
+        [DebuggerStepThrough]
+        private void NavButton_MouseLeave(object sender, EventArgs e)
         {
-            Button navButton = sender as Button;
-
-            if (navButton != null)
+            if (sender is Button navButton)
             {
                 navButton.BackColor = Color.FromArgb(58, 58, 58);
                 navButton.ForeColor = Color.White;
             }
         }
 
-        private void searchTextBox_Enter(object sender, EventArgs e)
+        [DebuggerStepThrough]
+        private void SearchTextBox_Enter(object sender, EventArgs e)
         {
             if (searchTextBox.Text == "Search")
             {
                 searchTextBox.Text = "";
-                searchTextBox.ForeColor = Color.Black; 
+                searchTextBox.ForeColor = Color.Black;
             }
         }
-        private void searchTextBox_Leave(object sender, EventArgs e)
+        [DebuggerStepThrough]
+        private void SearchTextBox_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(searchTextBox.Text))
             {
                 searchTextBox.Text = "Search";
-                searchTextBox.ForeColor = Color.Gray; 
+                searchTextBox.ForeColor = Color.Gray;
             }
         }
         #endregion
-
         #region logic
-        public void checkFastVerification()
+        private void Verification(string ul = "Kirito", string up = "1234")
         {
-            string ul = Properties.Settings.Default.login;
-            string up = Properties.Settings.Default.password;
-            if (ul != null && MNBackend.CheckLogin(ul, up))
+            currentUser = MediaService.CheckLogin(ul, up);
+            if (currentUser.Role != UserRole.Guest)
             {
-                currentUser = new User(ul, up, "user");
                 addUserPanel(currentUser);
+                Console.WriteLine("Login Succesfull");
             }
             else
             {
+                if (loginButton == null) createLoginButton();
                 navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
+                Console.WriteLine("Login isn`t Succesfull");
             }
         }
+
+        private void ChangeNavLabelText(string newNavPageName)
+        {
+            currentNavPage = newNavPageName;
+            navButton.Text = currentNavPage;
+        }
+
         #endregion
-
-
-
     }
 }

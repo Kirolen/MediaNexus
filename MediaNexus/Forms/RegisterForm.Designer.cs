@@ -1,10 +1,8 @@
-﻿using System.Drawing;
-using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
-namespace MediaNexus.Forms
+namespace MediaNexus
 {
-    partial class RegisterForm : Form
+    partial class RegisterForm
     {
         /// <summary>
         /// Required designer variable.
@@ -26,10 +24,6 @@ namespace MediaNexus.Forms
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.textBoxUsername = new System.Windows.Forms.TextBox();

@@ -1,10 +1,12 @@
 ﻿using System.Drawing;
-using System.Windows.Forms;
 
-namespace MediaNexus.Forms
+namespace MediaNexus
 {
     partial class LoginForm
     {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Label labelTitle;
         private System.Windows.Forms.TextBox textBoxUsername;
@@ -12,6 +14,7 @@ namespace MediaNexus.Forms
         private System.Windows.Forms.Button buttonLogin;
         private System.Windows.Forms.Button buttonRegister;
         private System.Windows.Forms.CheckBox checkBoxRememberMe;
+
 
         /// <summary>
         /// Clean up any resources being used.
@@ -28,6 +31,10 @@ namespace MediaNexus.Forms
 
         #region Windows Form Designer generated code
 
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
         private void InitializeComponent()
         {
             this.labelTitle = new System.Windows.Forms.Label();
@@ -46,7 +53,7 @@ namespace MediaNexus.Forms
             this.labelTitle.ForeColor = Color.White;
             this.labelTitle.Font = new System.Drawing.Font("Arial", 14F, System.Drawing.FontStyle.Bold);
             this.labelTitle.AutoSize = true;
-            this.labelTitle.Location = new System.Drawing.Point(50, 31);   
+            this.labelTitle.Location = new System.Drawing.Point(50, 31);
             this.labelTitle.TabIndex = 0;
             // 
             // textBoxUsername
@@ -57,9 +64,9 @@ namespace MediaNexus.Forms
             this.textBoxUsername.ForeColor = System.Drawing.Color.Gray;
             this.textBoxUsername.Location = new System.Drawing.Point(50, 80);
             this.textBoxUsername.BackColor = Color.FromArgb(50, 50, 50);
-            this.textBoxUsername.TabIndex = 1; 
-            this.textBoxUsername.Enter += new System.EventHandler(this.textBoxUsername_Enter);
-            this.textBoxUsername.Leave += new System.EventHandler(this.textBoxUsername_Leave);
+            this.textBoxUsername.TabIndex = 1;
+            this.textBoxUsername.Enter += new System.EventHandler(this.TextBoxUsername_Enter);
+            this.textBoxUsername.Leave += new System.EventHandler(this.TextBoxUsername_Leave);
             // 
             // textBoxPassword
             // 
@@ -70,8 +77,8 @@ namespace MediaNexus.Forms
             this.textBoxPassword.Location = new System.Drawing.Point(50, 120);
             this.textBoxPassword.BackColor = Color.FromArgb(50, 50, 50);
             this.textBoxPassword.TabIndex = 2;
-            this.textBoxPassword.Enter += new System.EventHandler(this.textBoxPassword_Enter);
-            this.textBoxPassword.Leave += new System.EventHandler(this.textBoxPassword_Leave);
+            this.textBoxPassword.Enter += new System.EventHandler(this.TextBoxPassword_Enter);
+            this.textBoxPassword.Leave += new System.EventHandler(this.TextBoxPassword_Leave);
             // 
             // buttonLogin
             // 
@@ -82,7 +89,7 @@ namespace MediaNexus.Forms
             this.buttonLogin.TabIndex = 3;
             this.buttonLogin.Text = "Login";
             this.buttonLogin.UseVisualStyleBackColor = false;
-            this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
+            this.buttonLogin.Click += new System.EventHandler(this.ButtonLogin_Click);
             // 
             // buttonRegister
             // 
@@ -93,7 +100,7 @@ namespace MediaNexus.Forms
             this.buttonRegister.TabIndex = 4;
             this.buttonRegister.Text = "Register";
             this.buttonRegister.UseVisualStyleBackColor = false;
-            this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+            this.buttonRegister.Click += new System.EventHandler(this.ButtonRegister_Click);
             // 
             // checkBoxRememberMe
             // 
@@ -126,7 +133,6 @@ namespace MediaNexus.Forms
             this.PerformLayout();
 
         }
-
         #endregion
     }
 }

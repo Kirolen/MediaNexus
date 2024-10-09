@@ -23,36 +23,27 @@ namespace MediaNexus.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("server=localhost;port=3306;username=root;password=root;database=MediaNexus")]
-        public string DBLink {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string savedLogin {
             get {
-                return ((string)(this["DBLink"]));
+                return ((string)(this["savedLogin"]));
+            }
+            set {
+                this["savedLogin"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string login {
+        public string savedPassword {
             get {
-                return ((string)(this["login"]));
+                return ((string)(this["savedPassword"]));
             }
             set {
-                this["login"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string password {
-            get {
-                return ((string)(this["password"]));
-            }
-            set {
-                this["password"] = value;
+                this["savedPassword"] = value;
             }
         }
     }
