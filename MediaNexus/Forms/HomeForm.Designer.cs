@@ -1,7 +1,13 @@
-﻿using MN_Backend;
+﻿using MediaNexus_Backend;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace MediaNexus
 {
@@ -201,6 +207,7 @@ namespace MediaNexus
             static public Color longButtonBackColor { get; } = Color.FromArgb(100, 100, 100);
             static public Color historyPanelBackColor { get; } = Color.FromArgb(233, 247, 251);
         }
+        SortMediacs conditions; 
         #region Media Navigation Panel
         private void createNavMenuPanel()
         {
@@ -291,10 +298,10 @@ namespace MediaNexus
                 BackColor = DarkTheme.longButtonBackColor,
             };
 
-            TableLayoutPanel goButtonLayout = Components.CreateTableLayoutPanel(1, 2, Cursors.Hand);
-
-            goButtonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85F));
-            goButtonLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15F));
+            TableLayoutPanel goButtonLayout = Components.CreateTableLayoutPanel(1, 2,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100)}, 
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 85F), new ColumnStyle(SizeType.Percent, 15F)},
+                Cursors.Hand);
 
             Label buttonLabel = new Label()
             {
@@ -367,6 +374,7 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition)
             };
 
+            conditions = new SortMediacs();
             mediaBlocksTableLayoutPanel = AddMediaBlocks(5, 1, 1);
 
             mediaBlocksPanel.Controls.Add(mediaBlocksTableLayoutPanel);
@@ -376,7 +384,7 @@ namespace MediaNexus
         {
             TableLayoutPanel mediaBlocksTableLayoutPanel = Components.CreateTableLayoutPanel(rowCount, columnCount);
 
-            MainMedia[] RecentMedia = MediaService.GetRecentMedia(columnCount * rowCount, numPage);
+            MainMedia[] RecentMedia = MediaService.GetFilteredMedia(conditions, columnCount * rowCount, numPage);
 
             for (int i = 0; i < rowCount; i++)
             {
@@ -406,11 +414,11 @@ namespace MediaNexus
                 Tag = currentMedia,
             };
 
-            TableLayoutPanel mediaBlockTableLayoutPanel = Components.CreateTableLayoutPanel(3, 1, Cursors.Hand);
+            TableLayoutPanel mediaBlockTableLayoutPanel = Components.CreateTableLayoutPanel(3, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 85), new RowStyle(SizeType.Percent, 7.5F), new RowStyle(SizeType.Percent, 7.5F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F)},
+                Cursors.Hand);
 
-            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 85F));
-            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 7.5F));
-            mediaBlockTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 7.5F));
 
             PictureBox pictureBox = new PictureBox
             {
@@ -433,7 +441,7 @@ namespace MediaNexus
             };
             titleLabel.MouseEnter += (s, e) => ChangeButtonForeColor(titleLabel, Color.Orange);
             titleLabel.MouseLeave += (s, e) => ChangeButtonForeColor(titleLabel, Color.Black);
-            titleLabel.Click += new System.EventHandler(this.GoToNewMedia_button_Click);
+            titleLabel.Click += (s, e) => addMediInfoPanel(currentMedia);
 
             Label studioLabel = new Label
             {
@@ -445,10 +453,11 @@ namespace MediaNexus
             };
             studioLabel.MouseEnter += (s, e) => ChangeButtonForeColor(titleLabel, Color.Orange);
             studioLabel.MouseLeave += (s, e) => ChangeButtonForeColor(titleLabel, Color.Black);
-
+            studioLabel.Click += (s, e) => addMediInfoPanel(currentMedia);
 
             pictureBox.MouseEnter += (s, e) => ChangeButtonForeColor(titleLabel, Color.Orange);
             pictureBox.MouseLeave += (s, e) => ChangeButtonForeColor(titleLabel, Color.Black);
+            pictureBox.Click += (s, e) => addMediInfoPanel(currentMedia);
 
             mediaBlockTableLayoutPanel.Controls.Add(titleLabel, 0, 1);
             mediaBlockTableLayoutPanel.Controls.Add(studioLabel, 0, 2);
@@ -457,7 +466,6 @@ namespace MediaNexus
 
             return mediaBlock;
         }
-
         private void createMediaHistoryAndNavPanel()
         {
             int widthPanel = (int)(MediaPanel.Width * 0.95);
@@ -522,15 +530,12 @@ namespace MediaNexus
 
                 tagsTableLayoutPanel.Controls.Add(a, 0, 0);
                 outerTableLayoutPanel.Controls.Add(tagsTableLayoutPanel, i, 0);
-
-
             }
 
             outerTableLayoutPanel.Controls.Add(createHistoryPanel(), 0, 0);
             mediaHistoryAndNavPanel.Controls.Add(outerTableLayoutPanel);
             MediaPanel.Controls.Add(mediaHistoryAndNavPanel);
         }
-
         private Panel createHistoryPanel()
         {
             Panel panel = new Panel
@@ -544,7 +549,6 @@ namespace MediaNexus
 
             return panel;
         }
-
         private Panel createMediaButton(string buttonText, Color bgColor, Color textColor, Color bpColor)
         {
             Panel buttonPanel = new Panel
@@ -629,8 +633,10 @@ namespace MediaNexus
 
             MediaListTableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
             MediaListTableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 30f));
-            MediaListControlTableLayout.Controls.Add(MediaListTableLayout);
+            MediaListControlTableLayout.Controls.Add(MediaListTableLayout, 0, 0);
 
+
+            MediaListControlTableLayout.Controls.Add(SortPanel(), 1, 0);
             mainMediaList = new Panel
             {
                 BackColor = Color.AliceBlue,
@@ -650,10 +656,162 @@ namespace MediaNexus
 
             mainPanel.Controls.Add(MediaPanel);
         }
+
+        private TableLayoutPanel SortPanel()
+        {
+            var main = Components.CreateTableLayoutPanel(4, 1,
+                rowStyles: new List<RowStyle>
+                {
+            new RowStyle(SizeType.Percent, 20),
+            new RowStyle(SizeType.Percent, 50),
+            new RowStyle(SizeType.Percent, 20),
+            new RowStyle(SizeType.Percent, 10)
+                },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            var mediaSort = CreateMediaSortPanel();
+            var genresSort = CreateGenresSortPanel();
+            var userListSort = CreateUserListSortPanel();
+
+            main.Controls.Add(mediaSort);
+            main.Controls.Add(genresSort);
+            main.Controls.Add(userListSort);
+
+            Button findButton = new Button
+            {
+                Text = "Search",
+                Dock = DockStyle.Fill
+            };
+
+            findButton.Click += (s, e) =>
+            {   
+                conditions.selectedTypes = GetSelectedOptions(mediaSort.Controls[1] as FlowLayoutPanel);
+                conditions.selectedGenres = GetSelectedGenres(genresSort.Controls[1] as FlowLayoutPanel);
+                conditions.selectedStatus = GetSelectedOptions(userListSort.Controls[1] as FlowLayoutPanel);
+
+               
+            };
+            main.Controls.Add(findButton);
+
+            return main;
+        }
+
+        private string[] GetSelectedOptions(FlowLayoutPanel flowLayoutPanel)
+        {
+            var selectedOptions = new List<string>();
+
+            foreach (var control in flowLayoutPanel.Controls)
+            {
+                if (control is CheckBox checkBox && checkBox.Checked)
+                {
+                    selectedOptions.Add(checkBox.Text);
+                }
+            }
+
+            return selectedOptions.ToArray();
+        }
+
+        private Genres[] GetSelectedGenres(FlowLayoutPanel flowLayoutPanel)
+        {
+            var selectedOptions = new List<Genres>();
+
+            foreach (var control in flowLayoutPanel.Controls)
+            {
+                if (control is CheckBox checkBox && checkBox.Checked)
+                {
+                    var genreId = checkBox.Tag is int id ? id : Convert.ToInt32(checkBox.Tag);
+                    selectedOptions.Add(new Genres(genreId, checkBox.Text));
+                }
+            }
+
+            return selectedOptions.ToArray();
+        }
+
+        private TableLayoutPanel CreateMediaSortPanel()
+        {
+            var mediaSort = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Percent, 100) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            mediaSort.Controls.Add(createNavLabel("mediaLabel", "Media:"));
+            var mediaTypes = new[] { "Media", "Book", "Comics", "Game" };
+            mediaSort.Controls.Add(CreateMediaCheckBoxes(mediaTypes));
+
+            return mediaSort;
+        }
+
+        private TableLayoutPanel CreateGenresSortPanel()
+        {
+            Genres[] genres = MediaService.GetGenres(); 
+
+            var genresSort = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Percent, 100) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            genresSort.Controls.Add(createNavLabel("genresLabel", "Genres:"));
+            genresSort.Controls.Add(CreateGenresCheckBoxes(genres));
+
+            return genresSort;
+        }
+
+        private TableLayoutPanel CreateUserListSortPanel()
+        {
+            var userListSort = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Percent, 100) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            userListSort.Controls.Add(createNavLabel("userListLabel", "List:"));
+            //var mediaTypes = new[] { "In Process", "Completed", "Planned", "Dropped" };
+            var mediaTypes = new[] { "Released", "Ongoing", "Announced", "Canceled", "Delayed"};
+            userListSort.Controls.Add(CreateMediaCheckBoxes(mediaTypes));
+
+            return userListSort;
+        }
+
+        private FlowLayoutPanel CreateMediaCheckBoxes(string[] types)
+        {
+            var flowLayoutPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false
+            };
+
+            // Add checkboxes dynamically
+            foreach (var type in types)
+            {
+                var checkBox = Components.CreateCheckBox(type, Color.AliceBlue);
+                flowLayoutPanel.Controls.Add(checkBox);
+            }
+
+            return flowLayoutPanel;
+        }
+
+        private FlowLayoutPanel CreateGenresCheckBoxes(Genres[] genres)
+        {
+            var flowLayoutPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false
+            };
+
+            // Add checkboxes for each genre
+            foreach (var genre in genres)
+            {
+                var checkBox = Components.CreateCheckBox(genre.GenreName, Color.AliceBlue);
+                checkBox.Tag = genre.GenreID; // Optionally store GenreID in Tag for later use
+                flowLayoutPanel.Controls.Add(checkBox);
+            }
+
+            return flowLayoutPanel;
+        }
+
         private void createPages()
         {
-            //int numMedia = MNBackend.GetMediaCount("media");
-            int numMedia = 5;
+            int numMedia = MediaService.CountFilteredMedia(conditions);
             int numPages = (int)Math.Ceiling((double)numMedia / (currentMediaCols * currentMediaRows));
 
             int maxButtons = 15;
@@ -722,7 +880,6 @@ namespace MediaNexus
 
             MediaListTableLayout.Controls.Add(pagesTableLayout, 0, 1);
         }
-
         private Button CreatePageButton(int pageNumber, bool isCurrent)
         {
             Button pageButton = new Button
@@ -1062,7 +1219,6 @@ namespace MediaNexus
             userNamePanel.Controls.Add(UserNameLabel);
             return userNamePanel;
         }
-
         private TableLayoutPanel CreateSettingsForm()
         {
             TableLayoutPanel settingsFormLayout = Components.CreateTableLayoutPanel(1, 2);
@@ -1075,7 +1231,6 @@ namespace MediaNexus
 
             return settingsFormLayout;
         }
-
         private TableLayoutPanel createInfoPanel()
         {
             TableLayoutPanel firstColumnLayout = Components.CreateTableLayoutPanel(7, 1);
@@ -1100,7 +1255,6 @@ namespace MediaNexus
 
             return firstColumnLayout;
         }
-
         private Button CreateSaveButton()
         {
             Button saveButton = new Button
@@ -1155,31 +1309,288 @@ namespace MediaNexus
 
         #endregion
 
-        #region Medio Info Panels
+        #region Media Info Panels
+        Panel MediaInfoControlPanel;
+        MainMedia currentMediaUse;
         private void addMediInfoPanel(MainMedia media)
-        {
-            if (media.MainType == MainMediaType.Media) return;
-
-
+        {   
+            currentMediaUse = media;
+            mainPanel.Controls.Clear();
+            ChangeNavLabelText(media.MainType.ToString());
+            MediaInfoControlPanel = createMediaInfoPanel(media);
+            mainPanel.Controls.Add(MediaInfoControlPanel);
+            
         }
 
         private Panel createMediaInfoPanel(MainMedia media)
         {
-            Panel mediaPanel = createMediaPanel(width: (int)(mainPanel.Width * 0.75), height: (int)(mainPanel.Height * 0.85), backColor: Color.FromArgb(30, 30, 30));
+            MediaInfoControlPanel = createMediaPanel(width: (int)(mainPanel.Width * 0.75), height: (int)(mainPanel.Height * 0.95), backColor: Color.FromArgb(30, 30, 30));
 
-            TableLayoutPanel rowsTableLayout = Components.CreateTableLayoutPanel(2, 1);
+            TableLayoutPanel rowsTableLayout = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 380), new RowStyle(SizeType.Percent, 100)},
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F)});
 
-            rowsTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            rowsTableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
+            MediaInfoControlPanel.Controls.Add(rowsTableLayout);
+
+           
+            rowsTableLayout.Controls.Add(mediaInfo(media), 0, 0);
+            showResponseButton(isResponse: false, rowsTableLayout, media);
+
+            return MediaInfoControlPanel;
+        }
+
+        private TableLayoutPanel mediaInfo(MainMedia media)
+        {
+            TableLayoutPanel infoTableLayout = Components.CreateTableLayoutPanel(1, 2,
+               rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100) },
+               colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180), new ColumnStyle(SizeType.Percent, 100) });
+
+            infoTableLayout.Controls.Add(ControlEpisodePanel(media.ImageURL), 0, 0);
+            infoTableLayout.Controls.Add(addMediaInformation(media.MainType, media.Id), 1, 0);
+
+            return infoTableLayout;
+        }
+
+        Button goToResponse;
+        Button goToMediaInfo;
+        private void showResponseButton(bool isResponse, TableLayoutPanel rowsTableLayout, MainMedia media)
+        {
+            goToResponse = new Button
+            {
+                Text = "->",
+                ForeColor = Color.White,
+                Height = 40,
+                Width = 50,
+                Anchor = AnchorStyles.Right | AnchorStyles.Bottom,
+            };
+
+            goToMediaInfo = new Button
+            {
+                Text = "<-",
+
+                Height = 40,
+                Width = 50,
+                Anchor = AnchorStyles.Left | AnchorStyles.Bottom,
+            };
+
+            goToMediaInfo.Click += (s, e) =>
+            {
+                rowsTableLayout.Controls.Clear();
+                rowsTableLayout.Controls.Add(mediaInfo(media), 0, 0);
+                rowsTableLayout.Controls.Add(goToResponse, 0, 1);
+            };
+
+            goToResponse.Click += (s, e) =>
+            {
+                rowsTableLayout.Controls.Clear();
+                rowsTableLayout.Controls.Add(createResponsePanel(media), 0, 0);
+                rowsTableLayout.Controls.Add(goToMediaInfo, 0, 1);
+            };
+
+            if (isResponse)
+                rowsTableLayout.Controls.Add(goToMediaInfo, 0, 1);
+            else
+                rowsTableLayout.Controls.Add(goToResponse, 0, 1);
+        }
+
+        private TableLayoutPanel createResponsePanel(MainMedia mediaб, bool isOnly = true)
+        {
+            TableLayoutPanel main = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Absolute, isOnly ? 220 : 180), new RowStyle(SizeType.Absolute, 100), new RowStyle(SizeType.Absolute, 30) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            Label responseLabel = new Label
+            {
+                Text = "Response:",
+                TextAlign = ContentAlignment.MiddleLeft,
+                Dock = DockStyle.Fill,
+                ForeColor = Color.White,
+                Font = new Font("Arial", 12, FontStyle.Bold)
+            };
+
+            TextBox userResponse = AddingForm.addTextBox("Write your response...", needMargin: false, multiLine: true);
+            userResponse.Height = 100;
+            FlowLayoutPanel flowLayoutPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                BackColor = Color.Yellow,
+                FlowDirection = FlowDirection.TopDown, // Встановлення напрямку потоку
+                WrapContents = false // Забезпечує, щоб панелі не обгорталися
+            };
+       
+            Button sendUserResponse = new Button
+            {
+                Dock = DockStyle.Fill,
+                Text = "Send Response",
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(28, 28, 28),
+                Margin = new Padding(0)
+            };
+
+            for(int i = 0; i < 5; i++)
+            {
+                Panel blue = new Panel
+                {             
+                    BackColor = Color.Blue,
+                    Height = 500,
+                    Width = flowLayoutPanel.Width,
+                    Margin = new Padding(5, 5, 5, 0)
+                };
+                //blue.BringToFront();
+
+                Label reviewLabel = new Label
+                {
+                    Text = $"Panel {i + 1}", // Текст для кожної панелі
+                    ForeColor = Color.White,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+
+                blue.Controls.Add(reviewLabel);
+                flowLayoutPanel.Controls.Add(blue); // Додаємо панель до flowLayoutPanel
+            }
+
+            sendUserResponse.Click += (s, e) =>
+            {
+                // Створення нової панелі рецензії
+                Panel blue = new Panel
+                {
+                    Dock = DockStyle.Top, // Використовуйте DockStyle.Top для правильного додавання
+                    BackColor = Color.Blue,
+                    Height = 80,
+                    Width = 100,
+                    Margin = new Padding(0, 5, 0, 0) // Додайте верхній відступ для відділення рецензій
+                };
+
+                // Можна додати текст або інші елементи до blue панелі, наприклад:
+                Label reviewLabel = new Label
+                {
+                    Text = userResponse.Text,
+                    ForeColor = Color.White,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+
+                blue.Controls.Add(reviewLabel); // Додаємо текст до панелі рецензії
+                flowLayoutPanel.Controls.Add(blue); // Додаємо панель рецензії до flowLayoutPanel
+                userResponse.Clear(); // Очищення текстового поля після надсилання
+            };
+
+            main.Controls.Add(responseLabel);
+            main.Controls.Add(flowLayoutPanel);
+            main.Controls.Add(userResponse);
+            main.Controls.Add(sendUserResponse);
+
+            return main;
+        }
+
+        private Panel ControlEpisodePanel(string url)
+        {
+            TableLayoutPanel control = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 280), new RowStyle(SizeType.Percent, 100F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180) });
+
+            Panel controlPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White,
+            };
+
+            control.Controls.Add(CreatePictureBox(url), 0, 0);
+
+            TableLayoutPanel titleControlTable = Components.CreateTableLayoutPanel(3, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180f) });
+
+            control.Controls.Add(titleControlTable);
+
+            titleControlTable.Controls.Add(MediaControl());
+            titleControlTable.Controls.Add(EpisodeConrol());
+            controlPanel.Controls.Add(control);
+
+            return controlPanel;
+        }
+        private Panel MediaControl()
+        {
+            Panel ControlPanel_CloseMode = new Panel
+            {
+                Height = 20,
+                ForeColor = Color.White,
+                BackColor = Color.Blue,
+                Margin = new Padding(0)
+            };
+
+            Label titleStatus = new Label
+            {
+                Text = "Add to list",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+            };
+
+            titleStatus.Click += (s, e) =>
+            {
+                ControlPanel_CloseMode.BackColor = Color.Green;
+            };
+
+            ControlPanel_CloseMode.Controls.Add(titleStatus);
+
+            return ControlPanel_CloseMode;
+        }
+        private TableLayoutPanel EpisodeConrol()
+        {
+            TableLayoutPanel episode = Components.CreateTableLayoutPanel(1, 3,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100F)},
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f) });
 
 
+            Button minusButton = new Button
+            {
+                Text = "-",
+                Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                Margin = new Padding(0),
+                FlatStyle = FlatStyle.Flat,
+            };
+            minusButton.FlatAppearance.BorderSize = 0;
+            // Текстовий контрол для відображення кількості серій
+            Label episodeCountLabel = new Label
+            {
+                Text = "10/10", // Приклад тексту
+                TextAlign = ContentAlignment.MiddleCenter,
+                Margin = new Padding(0)
+            };
 
+            // Кнопка для збільшення кількості серій
+            Button plusButton = new Button
+            {
+                Text = "+",
+                Anchor = AnchorStyles.Left | AnchorStyles.Top,
+                Margin = new Padding(0),
+                FlatStyle = FlatStyle.Flat,
+            };
+            plusButton.FlatAppearance.BorderSize = 0;
 
+            // Додавання контролів до TableLayoutPanel
+            episode.Controls.Add(minusButton, 0, 0); // Додати кнопку зменшення
+            episode.Controls.Add(episodeCountLabel, 1, 0); // Додати текстовий контрол
+            episode.Controls.Add(plusButton, 2, 0);
 
+            return episode;
+        }
 
+        private PictureBox CreatePictureBox(string pictureURL)
+        {
+            PictureBox mediaPictureBox = new PictureBox
+            {
+                Dock = DockStyle.Top,
+                Height = 260,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                BorderStyle = BorderStyle.FixedSingle,
+                Margin = new Padding(10),
+                ImageLocation = pictureURL,
+            };
 
-
-            return mediaPanel;
+            return mediaPictureBox;
         }
 
         private Panel createMediaPanel(int width, int height, Color backColor)
@@ -1193,10 +1604,68 @@ namespace MediaNexus
                 Size = new Size(width, height),
                 Location = new Point(xPosition, yPosition),
                 BackColor = backColor,
-                Margin = new Padding(0)
+                Margin = new Padding(0), 
             };
 
             return MediaPanel;
+        }
+
+        private Panel addMediaInformation(MainMediaType type, int mediaID)
+        {
+            Media media = MediaService.GetMedia(mediaID);
+            
+
+            Panel panel = new Panel {Dock  = DockStyle.Fill};
+            panel.Margin = new Padding(10);
+            TableLayoutPanel infoTableLayout = Components.CreateTableLayoutPanel(11, 1);
+            Font labelFontStyle = new Font("Arial", 12, FontStyle.Regular);
+            panel.Controls.Add(infoTableLayout);    
+            infoTableLayout.Controls.Add(createInfoLabel("Original name: ", media.OriginalName, labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("English name: ", media.EnglishName, labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Status: ", media.getStatusString(), labelFontStyle));
+            if (media.Status != MediaStatus.Ongoing && media.StartDate.Value != null) 
+                infoTableLayout.Controls.Add(createInfoLabel("Start date: ", media.StartDate.Value.ToString("yyyy-MM-dd"), labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Type: ", media.SecondMediaType.ToString(), labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Studio: ", media.Studio, labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Rating: ", media.PG_Rating.ToString(), labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Episode: ", media.getEpisodeString(), labelFontStyle));
+            infoTableLayout.Controls.Add(createInfoLabel("Episode duration: ", media.getEpisodeduration(), labelFontStyle));
+            if (media.Status == MediaStatus.Ongoing)
+                infoTableLayout.Controls.Add(createInfoLabel("Next episode: ", media.getNextEpisodeDAte(), labelFontStyle));
+
+            infoTableLayout.Controls.Add(createInfoLabel("Desctiption: ", "", labelFontStyle));
+            TextBox textBox = new TextBox
+            {
+                Text = media.Description,
+                ForeColor = Color.White,
+                Dock = DockStyle.Top, 
+                Font = new Font("Arial", 10, FontStyle.Regular),
+                BorderStyle = BorderStyle.None,
+                Multiline = true,
+                ReadOnly = true,
+                BackColor = Color.FromArgb(30, 30, 30),
+                ScrollBars = ScrollBars.Vertical, 
+                Height = 80
+            };
+            infoTableLayout.Controls.Add(textBox);
+
+
+            return panel;
+        }
+
+        Label createInfoLabel(string name, string val, Font font)
+        {
+            Label label = new Label
+            {
+                Text = name + val,
+                ForeColor = Color.White,
+                Dock = DockStyle.Fill,
+                Font = font,
+                AutoSize = true,
+                Margin = new Padding(5)
+            };
+
+            return label;
         }
         #endregion
 

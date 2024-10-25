@@ -36,6 +36,7 @@ namespace MediaNexus
             RecentMediaPanelResize();
             UserPanelLocation();
             ProfileSettingsPanelResize();
+            RecentMediaInfoPanelResize();
         }
         private void NavMenuResize()
         {
@@ -121,6 +122,45 @@ namespace MediaNexus
                 ProfileSettingsPanel.Location = new Point(xPosition, yPosition);
             }
         }
+
+        private void RecentMediaInfoPanelResize()
+        {
+            if (MediaInfoControlPanel != null)
+            {
+                int widthNewMedia = (int)(mainPanel.Width * 0.75);
+                int heightNewMedia = (int)(mainPanel.Height * 0.95);
+
+                int xPosition = (mainPanel.Width - widthNewMedia) / 2;
+                int yPosition = (mainPanel.Height - heightNewMedia) / 2;
+
+                MediaInfoControlPanel.Size = new Size(widthNewMedia, heightNewMedia);
+                MediaInfoControlPanel.Location = new Point(xPosition, yPosition);
+                TableLayoutPanel panel = MediaInfoControlPanel.Controls[0] as TableLayoutPanel;
+                if (heightNewMedia > 700)
+                {
+                    if (panel != null)
+                    {
+                        {
+                            panel.Controls.Clear();
+                            panel.Controls.Add(mediaInfo(currentMediaUse), 0, 0);
+                            panel.Controls.Add(createResponsePanel(currentMediaUse, isOnly: false), 0, 1);
+                        }
+                    }
+                }
+                else
+                {
+                    if (panel != null)
+                    {
+                        {
+                            panel.Controls.Clear();
+                            panel.Controls.Add(mediaInfo(currentMediaUse), 0, 0);
+                            showResponseButton(isResponse: false, panel, currentMediaUse);
+                        }
+                    }
+
+                }
+            }
+        }
         #endregion
 
 
@@ -146,7 +186,7 @@ namespace MediaNexus
 
 
 
-        
+
 
         //private void ListPanel_Resize()
         //{
@@ -192,10 +232,26 @@ namespace MediaNexus
 
             Button clickedButton = sender as Button;
 
-            if (clickedButton.Name == "navButton_media") ChangeNavLabelText("Media");
-            else if (clickedButton.Name == "navButton_comics") ChangeNavLabelText("Comics");
-            else if (clickedButton.Name == "navButton_book") ChangeNavLabelText("Books");
-            else if (clickedButton.Name == "navButton_games") ChangeNavLabelText("Games");
+            if (clickedButton.Name == "navButton_media")
+            {
+                ChangeNavLabelText("Media");
+                conditions = new SortMediacs(new[] { "Media" }, Array.Empty<Genres>(), Array.Empty<string>());
+            }
+            else if (clickedButton.Name == "navButton_comics")
+            {
+                ChangeNavLabelText("Comics");
+                conditions = new SortMediacs(new[] { "Comics" }, Array.Empty<Genres>(), Array.Empty<string>());
+            }
+            else if (clickedButton.Name == "navButton_book")
+            {
+                ChangeNavLabelText("Books");
+                conditions = new SortMediacs(new[] { "Book" }, Array.Empty<Genres>(), Array.Empty<string>());
+            }
+            else if (clickedButton.Name == "navButton_games")
+            {
+                ChangeNavLabelText("Games");
+                conditions = new SortMediacs(new[] { "Game" }, Array.Empty<Genres>(), Array.Empty<string>());
+            }
 
             createMediaListPanel();
         }
@@ -210,6 +266,7 @@ namespace MediaNexus
         private void GoToNewMedia_button_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
+            conditions = new SortMediacs();
             ChangeNavLabelText("New");
             createMediaListPanel();    
         }
