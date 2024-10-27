@@ -12,6 +12,8 @@ namespace MediaNexus
         public LoginForm()
         {
             InitializeComponent();
+
+
         }
 
         private void TextBoxUsername_Enter(object sender, EventArgs e)

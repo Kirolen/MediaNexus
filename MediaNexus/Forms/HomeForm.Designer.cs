@@ -1,4 +1,5 @@
-﻿using MediaNexus_Backend;
+﻿using MediaNexus.Forms;
+using MediaNexus_Backend;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,8 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using System.Xml.Linq;
-
 namespace MediaNexus
 {
     partial class HomeForm
@@ -207,7 +206,7 @@ namespace MediaNexus
             static public Color longButtonBackColor { get; } = Color.FromArgb(100, 100, 100);
             static public Color historyPanelBackColor { get; } = Color.FromArgb(233, 247, 251);
         }
-        SortMediacs conditions; 
+        SortMedia conditions; 
         #region Media Navigation Panel
         private void createNavMenuPanel()
         {
@@ -374,7 +373,7 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition)
             };
 
-            conditions = new SortMediacs();
+            conditions = new SortMedia();
             mediaBlocksTableLayoutPanel = AddMediaBlocks(5, 1, 1);
 
             mediaBlocksPanel.Controls.Add(mediaBlocksTableLayoutPanel);
@@ -637,21 +636,7 @@ namespace MediaNexus
 
 
             MediaListControlTableLayout.Controls.Add(SortPanel(), 1, 0);
-            mainMediaList = new Panel
-            {
-                BackColor = Color.AliceBlue,
-                Dock = DockStyle.Fill
-            };
-
-            int minBlockWidth = 110;
-            int minBlockHeight = 190;
-
-            currentMediaCols = MediaListTableLayout.Width / minBlockWidth;
-            currentMediaRows = MediaListTableLayout.Height / minBlockHeight;
-
-            mainMediaList.Controls.Add(AddMediaBlocks(currentMediaCols, currentMediaRows, page));
-
-            MediaListTableLayout.Controls.Add(mainMediaList, 0, 0);
+            AddMediaList(page);
             createPages();
 
             mainPanel.Controls.Add(MediaPanel);
@@ -663,7 +648,8 @@ namespace MediaNexus
                 rowStyles: new List<RowStyle>
                 {
             new RowStyle(SizeType.Percent, 20),
-            new RowStyle(SizeType.Percent, 50),
+            new RowStyle(SizeType.Percent, 30),
+            new RowStyle(SizeType.Percent, 20),
             new RowStyle(SizeType.Percent, 20),
             new RowStyle(SizeType.Percent, 10)
                 },
@@ -672,10 +658,12 @@ namespace MediaNexus
             var mediaSort = CreateMediaSortPanel();
             var genresSort = CreateGenresSortPanel();
             var userListSort = CreateUserListSortPanel();
+            var mediaStatusSort = CreateMediaStatusSortPanel();
 
             main.Controls.Add(mediaSort);
             main.Controls.Add(genresSort);
             main.Controls.Add(userListSort);
+            main.Controls.Add(mediaStatusSort);
 
             Button findButton = new Button
             {
@@ -688,10 +676,14 @@ namespace MediaNexus
                 conditions.selectedTypes = GetSelectedOptions(mediaSort.Controls[1] as FlowLayoutPanel);
                 conditions.selectedGenres = GetSelectedGenres(genresSort.Controls[1] as FlowLayoutPanel);
                 conditions.selectedStatus = GetSelectedOptions(userListSort.Controls[1] as FlowLayoutPanel);
-
-               
+                conditions.selectedMediaStatus = GetSelectedOptions(mediaStatusSort.Controls[1] as FlowLayoutPanel);
+                conditions.userID = currentUser.Id;
+                AddMediaList(1);
+                createPages();
             };
             main.Controls.Add(findButton);
+
+           
 
             return main;
         }
@@ -761,11 +753,24 @@ namespace MediaNexus
                 colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
 
             userListSort.Controls.Add(createNavLabel("userListLabel", "List:"));
-            //var mediaTypes = new[] { "In Process", "Completed", "Planned", "Dropped" };
-            var mediaTypes = new[] { "Released", "Ongoing", "Announced", "Canceled", "Delayed"};
+            var mediaTypes = new[] { "InProcess", "Completed", "Planned", "Dropped" };
+            
             userListSort.Controls.Add(CreateMediaCheckBoxes(mediaTypes));
 
             return userListSort;
+        }
+
+        private TableLayoutPanel CreateMediaStatusSortPanel()
+        {
+            var mediaStatusSort = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Percent, 100) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Percent, 100F) });
+
+            mediaStatusSort.Controls.Add(createNavLabel("mediaStatusLabel", "Status:"));
+            var mediaStatus = new[] { "Released", "Ongoing", "Announced", "Canceled", "Delayed" };
+            mediaStatusSort.Controls.Add(CreateMediaCheckBoxes(mediaStatus));
+
+            return mediaStatusSort;
         }
 
         private FlowLayoutPanel CreateMediaCheckBoxes(string[] types)
@@ -778,7 +783,6 @@ namespace MediaNexus
                 WrapContents = false
             };
 
-            // Add checkboxes dynamically
             foreach (var type in types)
             {
                 var checkBox = Components.CreateCheckBox(type, Color.AliceBlue);
@@ -798,7 +802,6 @@ namespace MediaNexus
                 WrapContents = false
             };
 
-            // Add checkboxes for each genre
             foreach (var genre in genres)
             {
                 var checkBox = Components.CreateCheckBox(genre.GenreName, Color.AliceBlue);
@@ -811,6 +814,12 @@ namespace MediaNexus
 
         private void createPages()
         {
+            if (MediaListTableLayout.Controls.Contains(pagesTableLayout))
+            {
+                MediaListTableLayout.Controls.Remove(pagesTableLayout);
+                pagesTableLayout.Dispose();
+            }
+
             int numMedia = MediaService.CountFilteredMedia(conditions);
             int numPages = (int)Math.Ceiling((double)numMedia / (currentMediaCols * currentMediaRows));
 
@@ -891,28 +900,41 @@ namespace MediaNexus
 
             pageButton.Click += (sender, e) =>
             {
-                mainPanel.Controls.Clear();
-                createMediaListPanel(pageNumber);
+                AddMediaList(pageNumber);
             };
 
             return pageButton;
         }
 
+        private void AddMediaList(int pageNumber)
+        {
+            if (MediaListTableLayout.Controls.Contains(mainMediaList))
+            {
+                MediaListTableLayout.Controls.Remove(mainMediaList);
+                mainMediaList.Dispose();
+            }
 
+            mainMediaList = new Panel
+            {
+                BackColor = Color.AliceBlue,
+                Dock = DockStyle.Fill
+            };
 
-        // Функція для оновлення сторінки
-        //private void UpdatePage()
-        //{
-        //    // Логіка для оновлення контенту сторінки
-        //    // Наприклад, виклик методу для відображення медіа для currentPage
-        //    DisplayMediaForPage(currentPage);
-        //}
+            int minBlockWidth = 110;
+            int minBlockHeight = 190;
 
+            currentMediaCols = MediaListTableLayout.Width / minBlockWidth;
+            currentMediaRows = MediaListTableLayout.Height / minBlockHeight;
 
-        #endregion
+            mainMediaList.Controls.Add(AddMediaBlocks(currentMediaCols, currentMediaRows, pageNumber));
 
-        #region Navigation Label
-        private Label createNavLabel(string labelName, string labelText)
+            MediaListTableLayout.Controls.Add(mainMediaList, 0, 0);
+    }
+
+    #endregion
+
+    #region Navigation Label
+    private Label createNavLabel(string labelName, string labelText)
         {
             Label navLabel = new Label
             {
@@ -1065,7 +1087,7 @@ namespace MediaNexus
             userNavLayout.Controls.Add(accountLabel, 0, 0);
 
             userNavLayout.Controls.Add(createUserNavButton("Profile", ProfileButton_Click), 0, 1);
-            userNavLayout.Controls.Add(createUserNavButton("My Media List", ExitButton_Click), 0, 2); //need change
+            userNavLayout.Controls.Add(createUserNavButton("My Media List", MyMediaList_Click), 0, 2); 
             userNavLayout.Controls.Add(createUserNavButton("Settings", ProfileSettingsButton_Click), 0, 3);
             userNavLayout.Controls.Add(createUserNavButton("Exit", ExitButton_Click), 0, 4);
 
@@ -1315,11 +1337,11 @@ namespace MediaNexus
         private void addMediInfoPanel(MainMedia media)
         {   
             currentMediaUse = media;
+            UserMediaStatus inUserList = MediaService.GetUserMediaStatus(currentUser.Id, media.Id);
             mainPanel.Controls.Clear();
             ChangeNavLabelText(media.MainType.ToString());
             MediaInfoControlPanel = createMediaInfoPanel(media);
             mainPanel.Controls.Add(MediaInfoControlPanel);
-            
         }
 
         private Panel createMediaInfoPanel(MainMedia media)
@@ -1345,7 +1367,8 @@ namespace MediaNexus
                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100) },
                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180), new ColumnStyle(SizeType.Percent, 100) });
 
-            infoTableLayout.Controls.Add(ControlEpisodePanel(media.ImageURL), 0, 0);
+            
+            infoTableLayout.Controls.Add(ControlEpisodePanel(media.ImageURL, media.Id), 0, 0);
             infoTableLayout.Controls.Add(addMediaInformation(media.MainType, media.Id), 1, 0);
 
             return infoTableLayout;
@@ -1393,7 +1416,7 @@ namespace MediaNexus
                 rowsTableLayout.Controls.Add(goToResponse, 0, 1);
         }
 
-        private TableLayoutPanel createResponsePanel(MainMedia mediaб, bool isOnly = true)
+        private TableLayoutPanel createResponsePanel(MainMedia media, bool isOnly = true)
         {
             TableLayoutPanel main = Components.CreateTableLayoutPanel(2, 1,
                 rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30), new RowStyle(SizeType.Absolute, isOnly ? 220 : 180), new RowStyle(SizeType.Absolute, 100), new RowStyle(SizeType.Absolute, 30) },
@@ -1415,8 +1438,8 @@ namespace MediaNexus
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 BackColor = Color.Yellow,
-                FlowDirection = FlowDirection.TopDown, // Встановлення напрямку потоку
-                WrapContents = false // Забезпечує, щоб панелі не обгорталися
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false 
             };
        
             Button sendUserResponse = new Button
@@ -1437,7 +1460,6 @@ namespace MediaNexus
                     Width = flowLayoutPanel.Width,
                     Margin = new Padding(5, 5, 5, 0)
                 };
-                //blue.BringToFront();
 
                 Label reviewLabel = new Label
                 {
@@ -1483,99 +1505,6 @@ namespace MediaNexus
             main.Controls.Add(sendUserResponse);
 
             return main;
-        }
-
-        private Panel ControlEpisodePanel(string url)
-        {
-            TableLayoutPanel control = Components.CreateTableLayoutPanel(2, 1,
-                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 280), new RowStyle(SizeType.Percent, 100F) },
-                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180) });
-
-            Panel controlPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.White,
-            };
-
-            control.Controls.Add(CreatePictureBox(url), 0, 0);
-
-            TableLayoutPanel titleControlTable = Components.CreateTableLayoutPanel(3, 1,
-                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F) },
-                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180f) });
-
-            control.Controls.Add(titleControlTable);
-
-            titleControlTable.Controls.Add(MediaControl());
-            titleControlTable.Controls.Add(EpisodeConrol());
-            controlPanel.Controls.Add(control);
-
-            return controlPanel;
-        }
-        private Panel MediaControl()
-        {
-            Panel ControlPanel_CloseMode = new Panel
-            {
-                Height = 20,
-                ForeColor = Color.White,
-                BackColor = Color.Blue,
-                Margin = new Padding(0)
-            };
-
-            Label titleStatus = new Label
-            {
-                Text = "Add to list",
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleCenter,
-            };
-
-            titleStatus.Click += (s, e) =>
-            {
-                ControlPanel_CloseMode.BackColor = Color.Green;
-            };
-
-            ControlPanel_CloseMode.Controls.Add(titleStatus);
-
-            return ControlPanel_CloseMode;
-        }
-        private TableLayoutPanel EpisodeConrol()
-        {
-            TableLayoutPanel episode = Components.CreateTableLayoutPanel(1, 3,
-                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100F)},
-                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f) });
-
-
-            Button minusButton = new Button
-            {
-                Text = "-",
-                Anchor = AnchorStyles.Right | AnchorStyles.Top,
-                Margin = new Padding(0),
-                FlatStyle = FlatStyle.Flat,
-            };
-            minusButton.FlatAppearance.BorderSize = 0;
-            // Текстовий контрол для відображення кількості серій
-            Label episodeCountLabel = new Label
-            {
-                Text = "10/10", // Приклад тексту
-                TextAlign = ContentAlignment.MiddleCenter,
-                Margin = new Padding(0)
-            };
-
-            // Кнопка для збільшення кількості серій
-            Button plusButton = new Button
-            {
-                Text = "+",
-                Anchor = AnchorStyles.Left | AnchorStyles.Top,
-                Margin = new Padding(0),
-                FlatStyle = FlatStyle.Flat,
-            };
-            plusButton.FlatAppearance.BorderSize = 0;
-
-            // Додавання контролів до TableLayoutPanel
-            episode.Controls.Add(minusButton, 0, 0); // Додати кнопку зменшення
-            episode.Controls.Add(episodeCountLabel, 1, 0); // Додати текстовий контрол
-            episode.Controls.Add(plusButton, 2, 0);
-
-            return episode;
         }
 
         private PictureBox CreatePictureBox(string pictureURL)
@@ -1666,6 +1595,157 @@ namespace MediaNexus
             };
 
             return label;
+        }
+
+
+        TableLayoutPanel titleControlTable;
+        private Panel ControlEpisodePanel(string url, int mediaId)
+        {
+            TableLayoutPanel control = Components.CreateTableLayoutPanel(2, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 280), new RowStyle(SizeType.Percent, 100F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180) });
+
+            Panel controlPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+            };
+
+            control.Controls.Add(CreatePictureBox(url), 0, 0);
+
+
+            if (currentUser.Role != UserRole.Guest)
+            {
+               titleControlTable = Components.CreateTableLayoutPanel(3, 1,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F), new RowStyle(SizeType.Absolute, 30F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 180f) });
+
+                control.Controls.Add(titleControlTable);
+                UserMediaStatus inUserList = MediaService.GetUserMediaStatus(currentUser.Id, mediaId);
+
+                titleControlTable.Controls.Add(MediaControl(inUserList), 0, 0);
+                if (inUserList != null) titleControlTable.Controls.Add(EpisodeConrol(inUserList), 1, 0);
+            }
+            controlPanel.Controls.Add(control);
+
+            return controlPanel;
+        }
+        Label titleStatus;
+        private Panel MediaControl(UserMediaStatus inUserList)
+        {
+            Panel ControlPanel_CloseMode = new Panel
+            {
+                Height = 20,
+                ForeColor = Color.White,
+                BackColor = Color.Blue,
+                Margin = new Padding(10, 0, 10, 0)
+            };
+            
+            titleStatus = new Label
+            {
+                Text = inUserList == null ? "Add to list" 
+                                    : inUserList.Status == MediaStatusInUserList.InProcess 
+                                    ? "In Procces" : inUserList.Status.ToString(),
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+            };
+
+            titleStatus.Click += (s, e) =>
+            {
+                if (titleStatus.Text == "Add to list")
+                {
+                    titleStatus.Text = "In Procces";
+                    inUserList = new UserMediaStatus(currentMediaUse.Id, currentUser.Id, MediaStatusInUserList.InProcess, 0);
+                    MediaService.AddOrUpdateUserMediaStatus(inUserList);
+                    titleControlTable.Controls.Add(EpisodeConrol(inUserList), 1, 0);
+                }     
+                else 
+                {
+                    UserMediaStatusForm control = new UserMediaStatusForm(inUserList, currentMediaUse);
+                    control.ShowDialog();
+                    titleStatus.Text = control.newInUserList.Status == MediaStatusInUserList.InProcess
+                    ? "In Procces" : control.newInUserList.Status.ToString();
+                    titleControlTable.Controls.RemoveAt(1);
+     
+                    titleControlTable.Controls.Add(EpisodeConrol(inUserList), 1, 0);
+                }
+            };
+
+            ControlPanel_CloseMode.Controls.Add(titleStatus);
+
+            return ControlPanel_CloseMode;
+        }
+        private TableLayoutPanel EpisodeConrol(UserMediaStatus inUserList)
+        {
+            TableLayoutPanel episode = Components.CreateTableLayoutPanel(1, 3,
+                rowStyles: new List<RowStyle> { new RowStyle(SizeType.Percent, 100F) },
+                colStyles: new List<ColumnStyle> { new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f), new ColumnStyle(SizeType.Absolute, 60f) });
+
+
+            Button minusButton = new Button
+            {
+                Text = "-",
+                Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                Margin = new Padding(0),
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White
+            };
+            minusButton.FlatAppearance.BorderSize = 0;
+
+
+            int full = MediaService.GetMediaCountByType(currentMediaUse.MainType, currentMediaUse.Id);
+            int ended = inUserList.EndedPageOrEpisode;
+            Label episodeCountLabel = new Label
+            {
+                Text = ended.ToString() + "/" + (full != 0 ? full.ToString() : "?"),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Margin = new Padding(0),
+                ForeColor = Color.White
+            };
+
+            Button plusButton = new Button
+            {
+                Text = "+",
+                Anchor = AnchorStyles.Left | AnchorStyles.Top,
+                Margin = new Padding(0),
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White
+            };
+            plusButton.FlatAppearance.BorderSize = 0;
+            plusButton.Click += (sender, e) => UpdateEpisodeCount(inUserList, episodeCountLabel, 1);
+            minusButton.Click += (sender, e) => UpdateEpisodeCount(inUserList, episodeCountLabel, -1);
+
+            episode.Controls.Add(minusButton, 0, 0); 
+            episode.Controls.Add(episodeCountLabel, 1, 0); 
+            episode.Controls.Add(plusButton, 2, 0);
+
+            return episode;
+        }
+        private void UpdateEpisodeCount(UserMediaStatus inUserList, Label episodeCountLabel, int change)
+        {
+            int full = MediaService.GetMediaCountByType(currentMediaUse.MainType, currentMediaUse.Id);
+           
+            if (change > 0 && inUserList.EndedPageOrEpisode < full)
+            {
+                inUserList.EndedPageOrEpisode++;
+                if (inUserList.EndedPageOrEpisode == full && full != 0)
+                {
+                    inUserList.Status = MediaStatusInUserList.Completed;
+                    titleStatus.Text = "Completed";
+                }
+            }
+            else if (change < 0 && inUserList.EndedPageOrEpisode > 0)
+            {
+                inUserList.EndedPageOrEpisode--;
+                if (inUserList.EndedPageOrEpisode < full && full != 0)
+                {
+                    inUserList.Status = MediaStatusInUserList.InProcess;
+                    titleStatus.Text = "In Procces";
+                }
+            }
+
+            episodeCountLabel.Text = inUserList.EndedPageOrEpisode.ToString() + "/" + (full != 0 ? full.ToString() : "?");
+
+            MediaService.AddOrUpdateUserMediaStatus(inUserList);
         }
         #endregion
 

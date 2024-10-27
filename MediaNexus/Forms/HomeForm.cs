@@ -17,7 +17,7 @@ namespace MediaNexus
             this.MinimumSize = new Size(800, 600);
 
             createMainMediaPanel();
-            Verification();
+            Verification(Properties.Settings.Default.savedLogin, Properties.Settings.Default.savedPassword);
         }
 
 
@@ -122,7 +122,6 @@ namespace MediaNexus
                 ProfileSettingsPanel.Location = new Point(xPosition, yPosition);
             }
         }
-
         private void RecentMediaInfoPanelResize()
         {
             if (MediaInfoControlPanel != null)
@@ -229,28 +228,27 @@ namespace MediaNexus
         {
             mainPanel.Controls.Clear();
 
-
             Button clickedButton = sender as Button;
 
             if (clickedButton.Name == "navButton_media")
             {
                 ChangeNavLabelText("Media");
-                conditions = new SortMediacs(new[] { "Media" }, Array.Empty<Genres>(), Array.Empty<string>());
+                conditions = new SortMedia(new[] { "Media" }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
             }
             else if (clickedButton.Name == "navButton_comics")
             {
                 ChangeNavLabelText("Comics");
-                conditions = new SortMediacs(new[] { "Comics" }, Array.Empty<Genres>(), Array.Empty<string>());
+                conditions = new SortMedia(new[] { "Comics" }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
             }
             else if (clickedButton.Name == "navButton_book")
             {
                 ChangeNavLabelText("Books");
-                conditions = new SortMediacs(new[] { "Book" }, Array.Empty<Genres>(), Array.Empty<string>());
+                conditions = new SortMedia(new[] { "Book" }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
             }
             else if (clickedButton.Name == "navButton_games")
             {
                 ChangeNavLabelText("Games");
-                conditions = new SortMediacs(new[] { "Game" }, Array.Empty<Genres>(), Array.Empty<string>());
+                conditions = new SortMedia(new[] { "Game" }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
             }
 
             createMediaListPanel();
@@ -266,7 +264,7 @@ namespace MediaNexus
         private void GoToNewMedia_button_Click(object sender, EventArgs e)
         {
             mainPanel.Controls.Clear();
-            conditions = new SortMediacs();
+            conditions = new SortMedia();
             ChangeNavLabelText("New");
             createMediaListPanel();    
         }
@@ -312,6 +310,18 @@ namespace MediaNexus
             if (loginButton == null) createLoginButton();
             navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
             createMainMediaPanel();
+        }
+
+        private void MyMediaList_Click(object sender, EventArgs e)
+        {
+            mainPanel.Controls.Clear();
+
+            Button clickedButton = sender as Button;
+
+            ChangeNavLabelText("Media");
+            conditions = new SortMedia(Array.Empty<string>(), Array.Empty<Genres>(), new[] {"Completed"}, Array.Empty<string>(), currentUser.Id);
+
+            createMediaListPanel();
         }
 
         private void ProfileSettingsButton_Click(object sender, EventArgs e)
@@ -394,19 +404,17 @@ namespace MediaNexus
         }
         #endregion
         #region logic
-        private void Verification(string ul = "Kirito", string up = "1234")
+        private void Verification(string ul, string up)
         {
             currentUser = MediaService.CheckLogin(ul, up);
             if (currentUser.Role != UserRole.Guest)
             {
                 addUserPanel(currentUser);
-                Console.WriteLine("Login Succesfull");
             }
             else
             {
                 if (loginButton == null) createLoginButton();
                 navTableLayoutPanel.Controls.Add(loginButton, 4, 0);
-                Console.WriteLine("Login isn`t Succesfull");
             }
         }
 
