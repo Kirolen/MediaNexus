@@ -60,6 +60,7 @@
     <Compile Include="Class\DateTimePickerPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Class\Theme.cs" />
     <Compile Include="Forms\AddingForm.cs">
       <SubType>Form</SubType>
     </Compile>

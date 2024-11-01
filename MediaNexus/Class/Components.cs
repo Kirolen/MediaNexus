@@ -5,6 +5,84 @@ using System.Windows.Forms;
 
 public class Components
 {
+    static public TextBox addTextBox(string palceHolder, bool needMargin = false, bool multiLine = false, bool isPassword = false, int fixedWidth = -1)
+    {
+        TextBox textBox;
+        if (fixedWidth < 0)
+        {
+            textBox = new TextBox
+            {
+                Dock = DockStyle.Top,
+                Multiline = multiLine,
+                Margin = needMargin ? new Padding(5) : new Padding(0),
+                PasswordChar = isPassword ? '\0' : '\0'
+            };
+            AddPlaceholder(textBox, palceHolder, isPassword);
+        }
+        else
+        {
+            textBox = new TextBox
+            {
+                Anchor = AnchorStyles.Left,
+                Width = fixedWidth,
+                Multiline = multiLine,
+                Margin = needMargin ? new Padding(5) : new Padding(0),
+                PasswordChar = isPassword ? '\0' : '\0'
+            };
+            AddPlaceholder(textBox, palceHolder, isPassword);
+        }
+
+
+        return textBox;
+    }
+    static public void AddPlaceholder(TextBox textBox, string placeholderText, bool isPassword)
+    {
+        textBox.Text = placeholderText;
+        textBox.ForeColor = Color.LightGray;
+        textBox.BackColor = Color.Black;
+
+        textBox.Enter += (s, e) =>
+        {
+            if (textBox.Text == placeholderText)
+            {
+                textBox.Text = "";
+                textBox.ForeColor = Color.White;
+                if (isPassword)
+                {
+                    textBox.PasswordChar = '*';
+                }
+            }
+        };
+
+        textBox.Leave += (s, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBox.Text = placeholderText;
+                textBox.ForeColor = Color.LightGray;
+                textBox.PasswordChar = '\0';
+            }
+        };
+    }
+
+    static public Label createLabel(string labelName, string labelText, Color foreColor, ContentAlignment align = ContentAlignment.BottomLeft)
+    {
+
+        Label navLabel = new Label
+        {
+            AutoSize = true,
+            Dock = DockStyle.Fill,
+            Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(204))),
+            ForeColor = foreColor,
+            Margin = new Padding(0),
+            Name = labelName,
+            TabIndex = 6,
+            Text = labelText,
+            TextAlign = align
+        };
+
+        return navLabel;
+    }
     static public CheckBox CreateCheckBox(string text, Color? backColor = null)
     {
         return new CheckBox
@@ -63,4 +141,22 @@ public class Components
 
         return table;
     }
+
+    static public Panel createPanel(int width, int height, Color backColor, Panel mainPanel)
+    {
+
+        int xPosition = (mainPanel.Width - width) / 2;
+        int yPosition = (mainPanel.Height - height) / 2;
+
+        Panel MediaPanel = new Panel
+        {
+            Size = new Size(width, height),
+            Location = new Point(xPosition, yPosition),
+            BackColor = backColor,
+            Margin = new Padding(0),
+        };
+
+        return MediaPanel;
+    }
+
 }

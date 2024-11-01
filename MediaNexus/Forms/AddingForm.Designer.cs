@@ -240,36 +240,6 @@ namespace MediaNexus
             addButton.Click += click;
             return addButton;
         }
-        static public TextBox addTextBox(string palceHolder, bool needMargin = false, bool multiLine = false, bool isPassword = false, int fixedWidth = -1)
-        {
-            TextBox textBox;
-            if (fixedWidth < 0)
-            {
-                textBox = new TextBox
-                {
-                    Dock = DockStyle.Top,
-                    Multiline = multiLine,
-                    Margin = needMargin ? new Padding(5) : new Padding(0),
-                    PasswordChar = isPassword ? '\0' : '\0'
-                };
-                AddPlaceholder(textBox, palceHolder, isPassword);
-            }
-            else
-            {
-                textBox = new TextBox
-                {
-                    Anchor = AnchorStyles.Left,
-                    Width = fixedWidth,
-                    Multiline = multiLine,
-                    Margin = needMargin ? new Padding(5) : new Padding(0),
-                    PasswordChar = isPassword ? '\0' : '\0'
-                };
-                AddPlaceholder(textBox, palceHolder, isPassword);
-            }
-   
-
-            return textBox;
-        }
         private ComboBox AddComboBox(string palceHolder, Type enumType)
         {
             ComboBox comboBox = new ComboBox { Dock = DockStyle.Top, };
@@ -292,35 +262,6 @@ namespace MediaNexus
         #endregion
 
         #region PlaceHolder
-        static public void AddPlaceholder(TextBox textBox, string placeholderText, bool isPassword)
-        {
-            textBox.Text = placeholderText;
-            textBox.ForeColor = Color.LightGray;
-            textBox.BackColor = Color.Black;
-
-            textBox.Enter += (s, e) =>
-            {
-                if (textBox.Text == placeholderText)
-                {
-                    textBox.Text = "";
-                    textBox.ForeColor = Color.White;
-                    if (isPassword)
-                    {
-                        textBox.PasswordChar = '*';
-                    }
-                }
-            };
-
-            textBox.Leave += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(textBox.Text))
-                {
-                    textBox.Text = placeholderText;
-                    textBox.ForeColor = Color.LightGray;
-                    textBox.PasswordChar = '\0';
-                }
-            };
-        }
         static public void AddPlaceholder(ComboBox comboBox, string placeholderText)
         {
             comboBox.Items.Add(placeholderText);
@@ -355,16 +296,16 @@ namespace MediaNexus
                 AutoSize = true
             };
 
-            originalName = addTextBox("Original name", needMargin: true);
-            englishName = addTextBox("English name", needMargin: true);
+            originalName = Components.addTextBox("Original name", needMargin: true);
+            englishName = Components.addTextBox("English name", needMargin: true);
             status = AddComboBox("Status", typeof(MediaStatus));
             pg_rating = AddComboBox("PG-Rating", typeof(PG_Rating));
             mediaType = AddComboBox("Media type", typeof(MediaType));
-            studio = addTextBox("Studio", needMargin: true);
-            totalEpisode = addTextBox("Total episode", needMargin: true);
-            realesedEpisode = addTextBox("Realesed episode", needMargin: true);
-            episodeDuration = addTextBox("Episode duration (in minute)", needMargin: true);
-            timeUntilNewEpisodeInSeconds = addTextBox("Time until new episode (hh:mm:ss)", needMargin: true);
+            studio = Components.addTextBox("Studio", needMargin: true);
+            totalEpisode = Components.addTextBox("Total episode", needMargin: true);
+            realesedEpisode = Components.addTextBox("Realesed episode", needMargin: true);
+            episodeDuration = Components.addTextBox("Episode duration (in minute)", needMargin: true);
+            timeUntilNewEpisodeInSeconds = Components.addTextBox("Time until new episode (hh:mm:ss)", needMargin: true);
             nextEpisodeDate = new DateTimePickerPanel();
             startDatePicker = new DatePickerPanel();
             endDatePicker = new DatePickerPanel();
@@ -401,13 +342,13 @@ namespace MediaNexus
                 AutoSize = true
             };
 
-            originalName = addTextBox("Original name", needMargin: true);
-            englishName = addTextBox("English name", needMargin: true);
+            originalName = Components.addTextBox("Original name", needMargin: true);
+            englishName = Components.addTextBox("English name", needMargin: true);
             status = AddComboBox("Status", typeof(MediaStatus));
             pg_rating = AddComboBox("PG-Rating", typeof(PG_Rating));
-            AuthorBox = addTextBox("Author", needMargin: true);
-            PagesBox = addTextBox("Pages", needMargin: true); 
-            ISBN_Box = addTextBox("ISBN", needMargin: true);
+            AuthorBox = Components.addTextBox("Author", needMargin: true);
+            PagesBox = Components.addTextBox("Pages", needMargin: true); 
+            ISBN_Box = Components.addTextBox("ISBN", needMargin: true);
             endDatePicker = new DatePickerPanel();
 
             //MediaType
@@ -441,10 +382,10 @@ namespace MediaNexus
 
             TableLayoutPanel firstRowLayout = CreateFirstRowTableLayoutPanel();
 
-            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = addTextBox("Enter Image URL", needMargin:false, fixedWidth: -1)), 0, 0);
+            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = Components.addTextBox("Enter Image URL", needMargin:false, fixedWidth: -1)), 0, 0);
             firstRowLayout.Controls.Add(addMediaInfoTable(), 1, 0);
 
-            descriptionTextBox = addTextBox("Enter media description", needMargin: true, multiLine: true);
+            descriptionTextBox = Components.addTextBox("Enter media description", needMargin: true, multiLine: true);
 
             descriptionTextBox.Height = 100;
             Button addButton = CreateAddButton("Add media", AddMediaButton_Click);
@@ -469,10 +410,10 @@ namespace MediaNexus
 
             TableLayoutPanel firstRowLayout = CreateFirstRowTableLayoutPanel();
 
-            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = addTextBox("Enter Image URL", needMargin: false, fixedWidth: -1)), 0, 0);
+            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = Components.addTextBox("Enter Image URL", needMargin: false, fixedWidth: -1)), 0, 0);
             firstRowLayout.Controls.Add(addBookInfoTable(), 1, 0);
 
-            descriptionTextBox = addTextBox("Enter book description", needMargin: true, multiLine: true);
+            descriptionTextBox = Components.addTextBox("Enter book description", needMargin: true, multiLine: true);
             descriptionTextBox.Height = 100;
 
             Button addButton = CreateAddButton("Add book", AddBookButton_Click);

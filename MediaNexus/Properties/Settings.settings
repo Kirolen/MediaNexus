@@ -8,5 +8,11 @@
     <Setting Name="savedPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="DefaultImageURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://ih1.redbubble.net/image.1066412296.0216/fposter,small,wall_texture,product,750x1000.u4.jpg</Value>
+    </Setting>
+    <Setting Name="isDarkTheme" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
