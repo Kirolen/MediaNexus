@@ -40,6 +40,10 @@ namespace MediaNexus
             this.Text = "AddingForm";
         }
 
+        /// <summary>
+        /// Sets the background color, text color, and client window size.
+        /// </summary>
+        /// <param name="size">The desired size for the window.</param>
         private void WindowProperties(Size size)
         {
             this.BackColor = Color.FromArgb(30, 30, 30);
@@ -48,6 +52,10 @@ namespace MediaNexus
         }
 
         #region Helpers component
+        /// <summary>
+        /// Creates and configures the main TableLayoutPanel with three rows and one column.
+        /// </summary>
+        /// <returns>A TableLayoutPanel configured as the main layout.</returns>
         private TableLayoutPanel CreateMainTableLayoutPanel()
         {
             TableLayoutPanel mainLayout = new TableLayoutPanel
@@ -59,6 +67,11 @@ namespace MediaNexus
             };
             return mainLayout;
         }
+
+        /// <summary>
+        /// Creates and configures a TableLayoutPanel for the first row, with two columns.
+        /// </summary>
+        /// <returns>A TableLayoutPanel configured for the first row layout.</returns>
         private TableLayoutPanel CreateFirstRowTableLayoutPanel()
         {
             TableLayoutPanel firstRowLayout = new TableLayoutPanel
@@ -71,6 +84,15 @@ namespace MediaNexus
             firstRowLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             return firstRowLayout;
         }
+
+        /// <summary>
+        /// Creates a TableLayoutPanel containing a label, a DatePicker component, and optionally, an add/remove button.
+        /// </summary>
+        /// <param name="labelText">The label text for the DatePicker.</param>
+        /// <param name="datePicker">The DatePicker component to be used.</param>
+        /// <param name="hasTime">Indicates whether to include time selection.</param>
+        /// <param name="needAddButton">Determines if the add button is necessary.</param>
+        /// <returns>A TableLayoutPanel containing the configured DatePicker.</returns>
         static public TableLayoutPanel datePicker(string labelText, DatePickerPanel datePicker, bool hasTime = false, bool needAddButton = true)
         {
             TableLayoutPanel panel = new TableLayoutPanel
@@ -89,7 +111,7 @@ namespace MediaNexus
             {
                 Text = labelText,
                 Dock = DockStyle.Left,
-                TextAlign = ContentAlignment.MiddleLeft, 
+                TextAlign = ContentAlignment.MiddleLeft,
                 ForeColor = Color.White,
             };
             panel.Controls.Add(label, 0, 0);
@@ -127,11 +149,18 @@ namespace MediaNexus
                     panel.Controls.Add(removeButton, 2, 0);
                 };
             }
-            else  
+            else
                 panel.Controls.Add(datePicker, 1, 0);
 
             return panel;
         }
+
+        /// <summary>
+        /// Creates a TableLayoutPanel with a PictureBox and a TextBox for a media image URL.
+        /// </summary>
+        /// <param name="UrlTextBox">A TextBox for the image URL input.</param>
+        /// <param name="size">Optional fixed size for the PictureBox.</param>
+        /// <returns>A TableLayoutPanel with a PictureBox for media images and a URL TextBox.</returns>
         static public TableLayoutPanel addMeddiaImageBox(TextBox UrlTextBox, Size? size = null)
         {
             bool hasFixedSize = (size == null) ? false : true;
@@ -193,6 +222,11 @@ namespace MediaNexus
 
             return imageLayout;
         }
+
+        /// <summary>
+        /// Creates a FlowLayoutPanel for selecting genres with an add genre button and up to nine ComboBox entries.
+        /// </summary>
+        /// <returns>A FlowLayoutPanel with an add genre button and ComboBox items for genres.</returns>
         private FlowLayoutPanel createGenresPanel()
         {
             FlowLayoutPanel panel = new FlowLayoutPanel
@@ -229,6 +263,13 @@ namespace MediaNexus
             panel.Controls.Add(addGenreButton);
             return panel;
         }
+
+        /// <summary>
+        /// Creates a Button with specified text and click event.
+        /// </summary>
+        /// <param name="buttonText">The text to display on the button.</param>
+        /// <param name="click">The click event handler for the button.</param>
+        /// <returns>A Button with the specified text and click event.</returns>
         private Button CreateAddButton(string buttonText, EventHandler click)
         {
             Button addButton = new Button
@@ -240,6 +281,13 @@ namespace MediaNexus
             addButton.Click += click;
             return addButton;
         }
+
+        /// <summary>
+        /// Adds a ComboBox configured with a placeholder and populated with enum values.
+        /// </summary>
+        /// <param name="palceHolder">Placeholder text to display in the ComboBox.</param>
+        /// <param name="enumType">The enum type to populate the ComboBox items.</param>
+        /// <returns>A ComboBox populated with enum values.</returns>
         private ComboBox AddComboBox(string palceHolder, Type enumType)
         {
             ComboBox comboBox = new ComboBox { Dock = DockStyle.Top, };
@@ -247,6 +295,12 @@ namespace MediaNexus
             comboBox.Items.AddRange(Enum.GetNames(enumType));
             return comboBox;
         }
+
+        /// <summary>
+        /// Creates a Label with specified text, white font color, and left alignment.
+        /// </summary>
+        /// <param name="labelText">The text for the label.</param>
+        /// <returns>A Label with the specified text and styling.</returns>
         static public Label createLabel(string labelText)
         {
             Label label = new Label
@@ -262,6 +316,12 @@ namespace MediaNexus
         #endregion
 
         #region PlaceHolder
+        /// <summary>
+        /// Adds a placeholder item to a ComboBox with a specified text and color settings,
+        /// which updates the ComboBox's text color based on selection.
+        /// </summary>
+        /// <param name="comboBox">The ComboBox to modify.</param>
+        /// <param name="placeholderText">The placeholder text to display initially.</param>
         static public void AddPlaceholder(ComboBox comboBox, string placeholderText)
         {
             comboBox.Items.Add(placeholderText);
@@ -286,6 +346,12 @@ namespace MediaNexus
         #endregion
 
         #region Info Panels
+        /// <summary>
+        /// Creates a TableLayoutPanel containing fields for media information including
+        /// original name, English name, status, PG rating, media type, and date fields.
+        /// Also includes a genres selection panel.
+        /// </summary>
+        /// <returns>A TableLayoutPanel populated with media information input fields.</returns>
         private TableLayoutPanel addMediaInfoTable()
         {
             TableLayoutPanel mediaInfoLayout = new TableLayoutPanel
@@ -332,6 +398,12 @@ namespace MediaNexus
             return mediaInfoLayout;
         }
 
+        /// <summary>
+        /// Creates a TableLayoutPanel containing fields for book information including
+        /// original name, English name, status, PG rating, author, pages, ISBN, and publisher date.
+        /// Also includes a genres selection panel.
+        /// </summary>
+        /// <returns>A TableLayoutPanel populated with book information input fields.</returns>
         private TableLayoutPanel addBookInfoTable()
         {
             TableLayoutPanel bookInfoLayout = new TableLayoutPanel
@@ -367,9 +439,12 @@ namespace MediaNexus
 
             return bookInfoLayout;
         }
-
         #endregion
 
+        /// <summary>
+        /// Initializes the panel for adding media, setting window properties and main layout,
+        /// and adding fields for media information, an image URL, a description, and an "Add media" button.
+        /// </summary>
         private void createAddMediaPanel()
         {
             WindowProperties(new Size(750, 630));
@@ -382,7 +457,7 @@ namespace MediaNexus
 
             TableLayoutPanel firstRowLayout = CreateFirstRowTableLayoutPanel();
 
-            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = Components.addTextBox("Enter Image URL", needMargin:false, fixedWidth: -1)), 0, 0);
+            firstRowLayout.Controls.Add(addMeddiaImageBox(imageUrlTextBox = Components.addTextBox("Enter Image URL", needMargin: false, fixedWidth: -1)), 0, 0);
             firstRowLayout.Controls.Add(addMediaInfoTable(), 1, 0);
 
             descriptionTextBox = Components.addTextBox("Enter media description", needMargin: true, multiLine: true);
@@ -398,6 +473,11 @@ namespace MediaNexus
 
             this.Controls.Add(mainLayout);
         }
+
+        /// <summary>
+        /// Initializes the panel for adding books, setting window properties and main layout,
+        /// and adding fields for book information, an image URL, a description, and an "Add book" button.
+        /// </summary>
         private void createAddBookPanel()
         {
             WindowProperties(new Size(750, 480));

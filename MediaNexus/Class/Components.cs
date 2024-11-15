@@ -1,11 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
+/// <summary>
+/// Provides methods to create and configure common UI components in Windows Forms.
+/// </summary>
 public class Components
 {
-    static public TextBox addTextBox(string palceHolder, bool needMargin = false, bool multiLine = false, bool isPassword = false, int fixedWidth = -1)
+    /// <summary>
+    /// Creates a <see cref="TextBox"/> with customizable placeholder text, margin, multiline mode, password mode, and width.
+    /// </summary>
+    /// <param name="palceHolder">Placeholder text displayed when the <see cref="TextBox"/> is empty.</param>
+    /// <param name="needMargin">If true, applies a margin around the <see cref="TextBox"/>. Default is false.</param>
+    /// <param name="multiLine">If true, allows multiple lines of text. Default is false.</param>
+    /// <param name="isPassword">If true, masks text input for passwords. Default is false.</param>
+    /// <param name="fixedWidth">Sets a fixed width. If negative, the <see cref="TextBox"/> uses <see cref="DockStyle.Top"/>. Default is -1.</param>
+    /// <returns>A configured <see cref="TextBox"/> instance.</returns>
+    public static TextBox addTextBox(string palceHolder, bool needMargin = false, bool multiLine = false, bool isPassword = false, int fixedWidth = -1)
     {
         TextBox textBox;
         if (fixedWidth < 0)
@@ -31,11 +42,16 @@ public class Components
             };
             AddPlaceholder(textBox, palceHolder, isPassword);
         }
-
-
         return textBox;
     }
-    static public void AddPlaceholder(TextBox textBox, string placeholderText, bool isPassword)
+
+    /// <summary>
+    /// Adds placeholder functionality to a given <see cref="TextBox"/>.
+    /// </summary>
+    /// <param name="textBox">The <see cref="TextBox"/> to which the placeholder is applied.</param>
+    /// <param name="placeholderText">Text displayed as the placeholder.</param>
+    /// <param name="isPassword">Determines if the <see cref="TextBox"/> is used for password input.</param>
+    public static void AddPlaceholder(TextBox textBox, string placeholderText, bool isPassword)
     {
         textBox.Text = placeholderText;
         textBox.ForeColor = Color.LightGray;
@@ -65,10 +81,17 @@ public class Components
         };
     }
 
-    static public Label createLabel(string labelName, string labelText, Color foreColor, ContentAlignment align = ContentAlignment.BottomLeft)
+    /// <summary>
+    /// Creates a <see cref="Label"/> with specified name, text, color, and alignment.
+    /// </summary>
+    /// <param name="labelName">Name of the <see cref="Label"/>.</param>
+    /// <param name="labelText">Text displayed on the <see cref="Label"/>.</param>
+    /// <param name="foreColor">Foreground color for the text.</param>
+    /// <param name="align">Text alignment. Default is <see cref="ContentAlignment.BottomLeft"/>.</param>
+    /// <returns>A configured <see cref="Label"/> instance.</returns>
+    public static Label createLabel(string labelName, string labelText, Color foreColor, ContentAlignment align = ContentAlignment.BottomLeft)
     {
-
-        Label navLabel = new Label
+        return new Label
         {
             AutoSize = true,
             Dock = DockStyle.Fill,
@@ -80,19 +103,34 @@ public class Components
             Text = labelText,
             TextAlign = align
         };
-
-        return navLabel;
     }
-    static public CheckBox CreateCheckBox(string text, Color? backColor = null)
+
+    /// <summary>
+    /// Creates a <see cref="CheckBox"/> with specified text and optional background color.
+    /// </summary>
+    /// <param name="text">Text displayed next to the <see cref="CheckBox"/>.</param>
+    /// <param name="backColor">Optional background color. Default is transparent.</param>
+    /// <returns>A configured <see cref="CheckBox"/> instance.</returns>
+    public static CheckBox CreateCheckBox(string text, Color? backColor = null)
     {
         return new CheckBox
         {
             Text = text,
-            BackColor = backColor ?? Color.Transparent, 
-            AutoSize = true 
+            BackColor = backColor ?? Color.Transparent,
+            AutoSize = true
         };
     }
-    static public TableLayoutPanel CreateTableLayoutPanel(int rows, int cols, List<RowStyle> rowStyles = null, List<ColumnStyle> colStyles = null, Cursor cursor = null)
+
+    /// <summary>
+    /// Creates a <see cref="TableLayoutPanel"/> with specified rows, columns, and optional styles.
+    /// </summary>
+    /// <param name="rows">Number of rows.</param>
+    /// <param name="cols">Number of columns.</param>
+    /// <param name="rowStyles">Custom row styles. Default is null.</param>
+    /// <param name="colStyles">Custom column styles. Default is null.</param>
+    /// <param name="cursor">Optional custom cursor. Default is <see cref="Cursors.Default"/>.</param>
+    /// <returns>A configured <see cref="TableLayoutPanel"/> instance.</returns>
+    public static TableLayoutPanel CreateTableLayoutPanel(int rows, int cols, List<RowStyle> rowStyles = null, List<ColumnStyle> colStyles = null, Cursor cursor = null)
     {
         TableLayoutPanel table = new TableLayoutPanel
         {
@@ -103,7 +141,6 @@ public class Components
             Cursor = cursor ?? Cursors.Default
         };
 
-        // Apply row styles
         if (rowStyles != null)
         {
             for (int i = 0; i < rows; i++)
@@ -115,13 +152,11 @@ public class Components
                 }
                 else
                 {
-                    // If there are fewer styles than rows, use AutoSize as a fallback
                     table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
                 }
             }
         }
 
-        // Apply column styles
         if (colStyles != null)
         {
             for (int i = 0; i < cols; i++)
@@ -133,7 +168,6 @@ public class Components
                 }
                 else
                 {
-                    // If there are fewer styles than columns, use AutoSize as a fallback
                     table.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
                 }
             }
@@ -142,21 +176,25 @@ public class Components
         return table;
     }
 
-    static public Panel createPanel(int width, int height, Color backColor, Panel mainPanel)
+    /// <summary>
+    /// Creates a <see cref="Panel"/> of specified size and color, centered within a parent panel.
+    /// </summary>
+    /// <param name="width">Width of the <see cref="Panel"/>.</param>
+    /// <param name="height">Height of the <see cref="Panel"/>.</param>
+    /// <param name="backColor">Background color of the <see cref="Panel"/>.</param>
+    /// <param name="mainPanel">Parent panel for centering.</param>
+    /// <returns>A configured <see cref="Panel"/> instance.</returns>
+    public static Panel createPanel(int width, int height, Color backColor, Panel mainPanel)
     {
-
         int xPosition = (mainPanel.Width - width) / 2;
         int yPosition = (mainPanel.Height - height) / 2;
 
-        Panel MediaPanel = new Panel
+        return new Panel
         {
             Size = new Size(width, height),
             Location = new Point(xPosition, yPosition),
             BackColor = backColor,
             Margin = new Padding(0),
         };
-
-        return MediaPanel;
     }
-
 }

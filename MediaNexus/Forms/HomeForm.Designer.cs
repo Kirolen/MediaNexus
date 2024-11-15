@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using MediaNexus.Class;
-using System.Runtime.Serialization;
 using System.ComponentModel;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-using static System.Net.WebRequestMethods;
+
 
 
 namespace MediaNexus
@@ -18,7 +16,7 @@ namespace MediaNexus
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        SortMedia conditions;
+        SortConditions conditions;
         Theme userTheme;
         MainMedia currentMediaUse;
 
@@ -350,7 +348,7 @@ namespace MediaNexus
                 Location = new Point(xPosition, yPosition)
             };
 
-            conditions = new SortMedia();
+            conditions = new SortConditions();
             mediaBlocksTableLayoutPanel = CreateMediaBlocks(5, 1, 1);
 
             mediaBlocksPanel.Controls.Add(mediaBlocksTableLayoutPanel);
@@ -997,7 +995,7 @@ namespace MediaNexus
 
             mainMediaList = new Panel
             {
-                BackColor = Color.AliceBlue,
+                BackColor = userTheme.getPanelColor(),
                 Dock = DockStyle.Fill
             };
 
@@ -1216,7 +1214,7 @@ namespace MediaNexus
         /// <param name="user">The user object containing the user's nickname and other information.</param>
         private void createSettingsPanel(User user)
         {
-            ProfileSettingsPanel = Components.createPanel(width: (int)(mainPanel.Width * 0.75), height: (int)(mainPanel.Height * 0.85), backColor: userTheme.getPanelColor(), mainPanel);
+            ProfileSettingsPanel = Components.createPanel(width: (int)(mainPanel.Width * 0.75), height: 450, backColor: userTheme.getPanelColor(), mainPanel);
 
             var ProfileSettingsLayout = Components.CreateTableLayoutPanel(2, 1,
                 rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 40F), new RowStyle(SizeType.Percent, 100F) },
@@ -1536,6 +1534,11 @@ namespace MediaNexus
             return main;
         }
 
+        /// <summary>
+        /// Creates a response panel for displaying user responses in the UI.
+        /// </summary>
+        /// <param name="userResponse">An instance of <see cref="UserResponse"/> containing the user's response data.</param>
+        /// <returns>A <see cref="Panel"/> configured to display the user's response information, including the user's image, nickname, and the response text.</returns>
         private Panel createResponsePanel(UserResponse userResponse)
         {
             var panel = new Panel
@@ -1707,7 +1710,7 @@ namespace MediaNexus
         /// <returns>A Panel containing the media control interface for the user.</returns>
         private Panel MediaControl(UserMediaStatus inUserList)
         {
-            Panel ControlPanel_CloseMode = new Panel
+            Panel ControlPanel = new Panel
             {
                 Height = 20,
                 ForeColor = userTheme.getLabelTextColor(),
@@ -1745,9 +1748,9 @@ namespace MediaNexus
                 }
             };
 
-            ControlPanel_CloseMode.Controls.Add(titleStatus);
+            ControlPanel.Controls.Add(titleStatus);
 
-            return ControlPanel_CloseMode;
+            return ControlPanel;
         }
 
         /// <summary>
@@ -1838,6 +1841,9 @@ namespace MediaNexus
         #endregion
 
         #region Profile Panel
+        /// <summary>
+        /// Adds a user profile panel to the main panel, displaying user information and media statistics.
+        /// </summary>
         void AddUserProfile()
         {
             ProfilePanel = Components.createPanel(width: (int)(mainPanel.Width * 0.75), height: 500, backColor: userTheme.getPanelColor(), mainPanel);
@@ -1854,6 +1860,10 @@ namespace MediaNexus
             ProfilePanel.Controls.Add(rowsTableLayout);
         }
 
+        /// <summary>
+        /// Creates a panel displaying user information, including profile picture, nickname, and registration details.
+        /// </summary>
+        /// <returns>A TableLayoutPanel containing the user information layout.</returns>
         private TableLayoutPanel createUserInfo()
         {
             var ProfilePanel = Components.CreateTableLayoutPanel(1, 2,
@@ -1862,7 +1872,7 @@ namespace MediaNexus
 
             PictureBox pictureBox = new PictureBox
             {
-                ImageLocation = "https://img.freepik.com/free-photo/love-illustrated-anime-style_23-2151103293.jpg",
+                ImageLocation = string.IsNullOrEmpty(currentUser.UserImageURL) ? Properties.Settings.Default.DefaultImageURL : currentUser.UserImageURL,
                 Height = 140,
                 Width = 140,
                 Margin = new Padding(15, 15, 0, 0),
@@ -1887,13 +1897,17 @@ namespace MediaNexus
             return ProfilePanel; 
         }
 
+        /// <summary>
+        /// Creates a panel displaying statistics of user media, categorized by type (Media, Book, Game, Comics).
+        /// </summary>
+        /// <returns>A TableLayoutPanel containing the media statistics layout.</returns>
         private TableLayoutPanel userListInfo()
         {
             TableLayoutPanel tableLayoutPanel = Components.CreateTableLayoutPanel(5, 1,
                 rowStyles: new List<RowStyle> { new RowStyle(SizeType.Absolute, 70), new RowStyle(SizeType.Absolute, 70), new RowStyle(SizeType.Absolute, 70), new RowStyle(SizeType.Absolute, 70), new RowStyle(SizeType.Percent, 100) }
                 );
             tableLayoutPanel.Margin = new Padding(25, 0, 25, 0);
-            SortMedia sortMedia;
+            SortConditions sortMedia;
 
             string mediaType;
             for (int i = 0; i < 4; ++i)
@@ -1903,7 +1917,7 @@ namespace MediaNexus
                 else if (i == 1) mediaType = "Book";
                 else if (i == 2) mediaType = "Game";
                 else mediaType = "Comics";
-                sortMedia = new SortMedia(new[] { mediaType }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
+                sortMedia = new SortConditions(new[] { mediaType }, Array.Empty<Genres>(), Array.Empty<string>(), Array.Empty<string>(), currentUser.Id);
 
                 sortMedia.selectedStatus = new[] { "Completed" };
                 int completed = MediaService.CountFilteredMedia(sortMedia);
@@ -1920,6 +1934,15 @@ namespace MediaNexus
             return tableLayoutPanel;
         }
 
+        /// <summary>
+        /// Creates a row in the media statistics table displaying the counts of each media status (completed, planned, in process, dropped).
+        /// </summary>
+        /// <param name="completed">The count of completed media.</param>
+        /// <param name="planned">The count of planned media.</param>
+        /// <param name="inProcess">The count of media in process.</param>
+        /// <param name="dropped">The count of dropped media.</param>
+        /// <param name="mediaType">The type of media (e.g., Media, Book, Game, Comics).</param>
+        /// <returns>A TableLayoutPanel representing the media statistics line.</returns>
         private TableLayoutPanel mediaInfoLine(int completed, int planned, int inProcess, int dropped, string mediaType)
         {
             int total = completed + planned + inProcess + dropped;
@@ -1983,8 +2006,6 @@ namespace MediaNexus
 
             return line;
         }
-
-        
 
         #endregion
 
