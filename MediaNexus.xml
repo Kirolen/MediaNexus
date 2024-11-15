@@ -1,0 +1,1229 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MediaNexus</name>
+    </assembly>
+    <members>
+        <member name="T:Components">
+            <summary>
+            Provides methods to create and configure common UI components in Windows Forms.
+            </summary>
+        </member>
+        <member name="M:Components.addTextBox(System.String,System.Boolean,System.Boolean,System.Boolean,System.Int32)">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.TextBox"/> with customizable placeholder text, margin, multiline mode, password mode, and width.
+            </summary>
+            <param name="palceHolder">Placeholder text displayed when the <see cref="T:System.Windows.Forms.TextBox"/> is empty.</param>
+            <param name="needMargin">If true, applies a margin around the <see cref="T:System.Windows.Forms.TextBox"/>. Default is false.</param>
+            <param name="multiLine">If true, allows multiple lines of text. Default is false.</param>
+            <param name="isPassword">If true, masks text input for passwords. Default is false.</param>
+            <param name="fixedWidth">Sets a fixed width. If negative, the <see cref="T:System.Windows.Forms.TextBox"/> uses <see cref="F:System.Windows.Forms.DockStyle.Top"/>. Default is -1.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.TextBox"/> instance.</returns>
+        </member>
+        <member name="M:Components.AddPlaceholder(System.Windows.Forms.TextBox,System.String,System.Boolean)">
+            <summary>
+            Adds placeholder functionality to a given <see cref="T:System.Windows.Forms.TextBox"/>.
+            </summary>
+            <param name="textBox">The <see cref="T:System.Windows.Forms.TextBox"/> to which the placeholder is applied.</param>
+            <param name="placeholderText">Text displayed as the placeholder.</param>
+            <param name="isPassword">Determines if the <see cref="T:System.Windows.Forms.TextBox"/> is used for password input.</param>
+        </member>
+        <member name="M:Components.createLabel(System.String,System.String,System.Drawing.Color,System.Drawing.ContentAlignment)">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.Label"/> with specified name, text, color, and alignment.
+            </summary>
+            <param name="labelName">Name of the <see cref="T:System.Windows.Forms.Label"/>.</param>
+            <param name="labelText">Text displayed on the <see cref="T:System.Windows.Forms.Label"/>.</param>
+            <param name="foreColor">Foreground color for the text.</param>
+            <param name="align">Text alignment. Default is <see cref="F:System.Drawing.ContentAlignment.BottomLeft"/>.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.Label"/> instance.</returns>
+        </member>
+        <member name="M:Components.CreateCheckBox(System.String,System.Nullable{System.Drawing.Color})">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.CheckBox"/> with specified text and optional background color.
+            </summary>
+            <param name="text">Text displayed next to the <see cref="T:System.Windows.Forms.CheckBox"/>.</param>
+            <param name="backColor">Optional background color. Default is transparent.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.CheckBox"/> instance.</returns>
+        </member>
+        <member name="M:Components.CreateTableLayoutPanel(System.Int32,System.Int32,System.Collections.Generic.List{System.Windows.Forms.RowStyle},System.Collections.Generic.List{System.Windows.Forms.ColumnStyle},System.Windows.Forms.Cursor)">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.TableLayoutPanel"/> with specified rows, columns, and optional styles.
+            </summary>
+            <param name="rows">Number of rows.</param>
+            <param name="cols">Number of columns.</param>
+            <param name="rowStyles">Custom row styles. Default is null.</param>
+            <param name="colStyles">Custom column styles. Default is null.</param>
+            <param name="cursor">Optional custom cursor. Default is <see cref="P:System.Windows.Forms.Cursors.Default"/>.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.TableLayoutPanel"/> instance.</returns>
+        </member>
+        <member name="M:Components.createPanel(System.Int32,System.Int32,System.Drawing.Color,System.Windows.Forms.Panel)">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.Panel"/> of specified size and color, centered within a parent panel.
+            </summary>
+            <param name="width">Width of the <see cref="T:System.Windows.Forms.Panel"/>.</param>
+            <param name="height">Height of the <see cref="T:System.Windows.Forms.Panel"/>.</param>
+            <param name="backColor">Background color of the <see cref="T:System.Windows.Forms.Panel"/>.</param>
+            <param name="mainPanel">Parent panel for centering.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.Panel"/> instance.</returns>
+        </member>
+        <member name="T:DatePickerPanel">
+            <summary>
+            A custom <see cref="T:System.Windows.Forms.Panel"/> control that allows the user to select a date using separate ComboBoxes for the year, month, and day.
+            </summary>
+        </member>
+        <member name="F:DatePickerPanel.yearComboBox">
+            <summary>
+            ComboBox for selecting the year.
+            </summary>
+        </member>
+        <member name="F:DatePickerPanel.monthComboBox">
+            <summary>
+            ComboBox for selecting the month.
+            </summary>
+        </member>
+        <member name="F:DatePickerPanel.dayComboBox">
+            <summary>
+            ComboBox for selecting the day.
+            </summary>
+        </member>
+        <member name="M:DatePickerPanel.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:DatePickerPanel"/> class with ComboBoxes for selecting a year, month, and day.
+            </summary>
+        </member>
+        <member name="M:DatePickerPanel.GetSelectedDate">
+            <summary>
+            Gets the selected date based on the user's selections in the year, month, and day ComboBoxes.
+            </summary>
+            <returns>A <see cref="T:System.DateTime"/> representing the selected date, or null if the date selection is incomplete or invalid.</returns>
+        </member>
+        <member name="M:DatePickerPanel.GetStandrtWidth">
+            <summary>
+            Gets the standard width for the <see cref="T:DatePickerPanel"/>.
+            </summary>
+            <returns>An integer representing the standard width (160).</returns>
+        </member>
+        <member name="T:DateTimePickerPanel">
+            <summary>
+            A custom <see cref="T:DatePickerPanel"/> control that extends date selection with hour and minute selection.
+            </summary>
+        </member>
+        <member name="F:DateTimePickerPanel.hourComboBox">
+            <summary>
+            ComboBox for selecting the hour.
+            </summary>
+        </member>
+        <member name="F:DateTimePickerPanel.minuteComboBox">
+            <summary>
+            ComboBox for selecting the minute.
+            </summary>
+        </member>
+        <member name="M:DateTimePickerPanel.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:DateTimePickerPanel"/> class, 
+            which includes ComboBoxes for selecting hours and minutes in addition to the date.
+            </summary>
+        </member>
+        <member name="M:DateTimePickerPanel.GetSelectedDateTime">
+            <summary>
+            Gets the selected date and time based on the user's selections in the date, hour, and minute ComboBoxes.
+            </summary>
+            <returns>A <see cref="T:System.DateTime"/> representing the selected date and time, or null if the selection is incomplete.</returns>
+        </member>
+        <member name="M:DateTimePickerPanel.GetStandrtWidth">
+            <summary>
+            Gets the standard width for the <see cref="T:DateTimePickerPanel"/>, including space for time selection.
+            </summary>
+            <returns>An integer representing the standard width (240).</returns>
+        </member>
+        <member name="T:MediaNexus.Class.Theme">
+            <summary>
+            Manages theme-related color settings for the application, based on a light or dark theme preference.
+            </summary>
+        </member>
+        <member name="P:MediaNexus.Class.Theme.DarkTheme">
+            <summary>
+            Gets or sets a value indicating whether the theme is dark.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MediaNexus.Class.Theme"/> class with a specified theme preference.
+            </summary>
+            <param name="darkTheme">True for a dark theme, false for a light theme.</param>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getDefaultButtonColor">
+            <summary>
+            Gets the default button color based on the theme.
+            </summary>
+            <returns>The button color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getDefaultButtonTextColor">
+            <summary>
+            Gets the default button text color based on the theme.
+            </summary>
+            <returns>The button text color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getResponseTextColor">
+            <summary>
+            Gets the color for response text based on the theme.
+            </summary>
+            <returns>The response text color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getMouseEnterButtonTextColor">
+            <summary>
+            Gets the button text color on mouse hover based on the theme.
+            </summary>
+            <returns>The hover button text color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getHistoryPanelColor">
+            <summary>
+            Gets the color for the history panel based on the theme.
+            </summary>
+            <returns>The history panel color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getPanelColor">
+            <summary>
+            Gets the default panel color based on the theme.
+            </summary>
+            <returns>The panel color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getLabelTextColor">
+            <summary>
+            Gets the label text color based on the theme.
+            </summary>
+            <returns>The label text color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getSortPanelColor">
+            <summary>
+            Gets the color for the sorting panel based on the theme.
+            </summary>
+            <returns>The sort panel color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getMouseEnterButtonColor">
+            <summary>
+            Gets the button background color on mouse hover based on the theme.
+            </summary>
+            <returns>The hover button background color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getNavPanelColor">
+            <summary>
+            Gets the color for the navigation panel based on the theme.
+            </summary>
+            <returns>The navigation panel color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getMainPanelColor">
+            <summary>
+            Gets the color for the main content panel based on the theme.
+            </summary>
+            <returns>The main panel color.</returns>
+        </member>
+        <member name="M:MediaNexus.Class.Theme.getUserPanelColor">
+            <summary>
+            Gets the color for the user panel based on the theme.
+            </summary>
+            <returns>The user panel color.</returns>
+        </member>
+        <member name="T:MediaNexus.AddingForm">
+            <summary>
+            Represents a form used for adding media items such as books or other types of media,
+            with fields and controls specific to the selected media type and user ID.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.AddingForm.mainMediaType">
+            <summary>
+            Specifies the type of media being added (e.g., Book, Media, Game, Comics).
+            </summary>
+        </member>
+        <member name="F:MediaNexus.AddingForm.userId">
+            <summary>
+            Stores the unique identifier of the user interacting with the form,
+            ensuring that added media is associated with the correct user.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.#ctor(System.String,MediaNexus_Backend.MainMediaType,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MediaNexus.AddingForm"/> class with specified media type,
+            user ID, and layout based on the selected content type (e.g., "media" or "book").
+            </summary>
+            <param name="type">A string that defines the type of content ("media" or "book") to configure the form layout.</param>
+            <param name="mediaType">The main type of media, used to set media-specific properties.</param>
+            <param name="id">The ID of the user adding the media; defaults to 0 if not specified.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddMediaButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the "Add Media" button click event by calling <see cref="M:MediaNexus.AddingForm.AddMedia"/> to create and save a new media entry.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="e">The event data.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddBookButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the "Add Book" button click event by calling <see cref="M:MediaNexus.AddingForm.AddBook"/> to create and save a new book entry.
+            </summary>
+            <param name="sender">The event sender.</param>
+            <param name="e">The event data.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddMedia">
+            <summary>
+            Creates and populates a <see cref="T:MediaNexus_Backend.Media"/> object with data entered in the form,
+            validates required fields, and adds the media to the database through <see cref="M:MediaNexus_Backend.MediaService.AddMediaToDatabase(MediaNexus_Backend.Media,MediaNexus_Backend.Genres[])"/>.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddBook">
+            <summary>
+            Creates and populates a <see cref="T:MediaNexus_Backend.Book"/> object with data entered in the form,
+            validates required fields, and adds the book to the database through <see cref="M:MediaNexus_Backend.MediaService.AddBookToDatabase(MediaNexus_Backend.Book,MediaNexus_Backend.Genres[])"/>.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.GetSelectedGenres">
+            <summary>
+            Retrieves the selected genres from the genres panel by iterating through its controls 
+            and checking for <see cref="T:System.Windows.Forms.ComboBox"/> controls with valid genre selections.
+            </summary>
+            <returns>An array of <see cref="T:MediaNexus_Backend.Genres"/> that were selected by the user.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.ConvertToSeconds(System.String)">
+            <summary>
+            Converts a time string in the format "hh:mm:ss" to the total number of seconds.
+            If the input is null, empty, or incorrectly formatted, returns 0.
+            </summary>
+            <param name="time">The time string in "hh:mm:ss" format.</param>
+            <returns>An integer representing the total seconds, or 0 if the input is invalid.</returns>
+        </member>
+        <member name="F:MediaNexus.AddingForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.WindowProperties(System.Drawing.Size)">
+            <summary>
+            Sets the background color, text color, and client window size.
+            </summary>
+            <param name="size">The desired size for the window.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.CreateMainTableLayoutPanel">
+            <summary>
+            Creates and configures the main TableLayoutPanel with three rows and one column.
+            </summary>
+            <returns>A TableLayoutPanel configured as the main layout.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.CreateFirstRowTableLayoutPanel">
+            <summary>
+            Creates and configures a TableLayoutPanel for the first row, with two columns.
+            </summary>
+            <returns>A TableLayoutPanel configured for the first row layout.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.datePicker(System.String,DatePickerPanel,System.Boolean,System.Boolean)">
+            <summary>
+            Creates a TableLayoutPanel containing a label, a DatePicker component, and optionally, an add/remove button.
+            </summary>
+            <param name="labelText">The label text for the DatePicker.</param>
+            <param name="datePicker">The DatePicker component to be used.</param>
+            <param name="hasTime">Indicates whether to include time selection.</param>
+            <param name="needAddButton">Determines if the add button is necessary.</param>
+            <returns>A TableLayoutPanel containing the configured DatePicker.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.addMeddiaImageBox(System.Windows.Forms.TextBox,System.Nullable{System.Drawing.Size})">
+            <summary>
+            Creates a TableLayoutPanel with a PictureBox and a TextBox for a media image URL.
+            </summary>
+            <param name="UrlTextBox">A TextBox for the image URL input.</param>
+            <param name="size">Optional fixed size for the PictureBox.</param>
+            <returns>A TableLayoutPanel with a PictureBox for media images and a URL TextBox.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.createGenresPanel">
+            <summary>
+            Creates a FlowLayoutPanel for selecting genres with an add genre button and up to nine ComboBox entries.
+            </summary>
+            <returns>A FlowLayoutPanel with an add genre button and ComboBox items for genres.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.CreateAddButton(System.String,System.EventHandler)">
+            <summary>
+            Creates a Button with specified text and click event.
+            </summary>
+            <param name="buttonText">The text to display on the button.</param>
+            <param name="click">The click event handler for the button.</param>
+            <returns>A Button with the specified text and click event.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddComboBox(System.String,System.Type)">
+            <summary>
+            Adds a ComboBox configured with a placeholder and populated with enum values.
+            </summary>
+            <param name="palceHolder">Placeholder text to display in the ComboBox.</param>
+            <param name="enumType">The enum type to populate the ComboBox items.</param>
+            <returns>A ComboBox populated with enum values.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.createLabel(System.String)">
+            <summary>
+            Creates a Label with specified text, white font color, and left alignment.
+            </summary>
+            <param name="labelText">The text for the label.</param>
+            <returns>A Label with the specified text and styling.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.AddPlaceholder(System.Windows.Forms.ComboBox,System.String)">
+            <summary>
+            Adds a placeholder item to a ComboBox with a specified text and color settings,
+            which updates the ComboBox's text color based on selection.
+            </summary>
+            <param name="comboBox">The ComboBox to modify.</param>
+            <param name="placeholderText">The placeholder text to display initially.</param>
+        </member>
+        <member name="M:MediaNexus.AddingForm.addMediaInfoTable">
+            <summary>
+            Creates a TableLayoutPanel containing fields for media information including
+            original name, English name, status, PG rating, media type, and date fields.
+            Also includes a genres selection panel.
+            </summary>
+            <returns>A TableLayoutPanel populated with media information input fields.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.addBookInfoTable">
+            <summary>
+            Creates a TableLayoutPanel containing fields for book information including
+            original name, English name, status, PG rating, author, pages, ISBN, and publisher date.
+            Also includes a genres selection panel.
+            </summary>
+            <returns>A TableLayoutPanel populated with book information input fields.</returns>
+        </member>
+        <member name="M:MediaNexus.AddingForm.createAddMediaPanel">
+            <summary>
+            Initializes the panel for adding media, setting window properties and main layout,
+            and adding fields for media information, an image URL, a description, and an "Add media" button.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.AddingForm.createAddBookPanel">
+            <summary>
+            Initializes the panel for adding books, setting window properties and main layout,
+            and adding fields for book information, an image URL, a description, and an "Add book" button.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:MediaNexus.HomeForm.#ctor" -->
+        <member name="M:MediaNexus.HomeForm.HomeForm_Resize(System.Object,System.EventArgs)">
+            <summary>
+            Handles the Resize event, calling <see cref="M:MediaNexus.HomeForm.ResizeControls"/> to adjust all child components' sizes and positions.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ResizeControls">
+            <summary>
+            Resizes and repositions the main layout and panels based on the current size of the form.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavMenuResize">
+            <summary>
+            Adjusts the size and location of the navigation menu panel.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.RecentMediaPanelResize">
+            <summary>
+            Resizes and repositions the recent media panel to fit proportionally within the main panel.
+            Also adjusts the size and position of the button and sub-elements.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.RecentMediaPanelElementsResize">
+            <summary>
+            Resizes sub-elements within the recent media panel, including the history and navigation panel.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.GoToNewMediaButtonResize">
+            <summary>
+            Adjusts the size and location of the "Go to New Media" button.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.UserPanelLocation">
+            <summary>
+            Adjusts the location of the user navigation panel based on the user panel's location.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ProfileSettingsPanelResize">
+            <summary>
+            Resizes and repositions the profile settings panel, keeping it centered within the main panel.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.RecentMediaInfoPanelResize">
+            <summary>
+            Resizes and repositions the recent media info panel. Adjusts content based on height thresholds.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ResponsePanelResize">
+            <summary>
+            Adjusts the size of individual response panels within the response flow layout panel.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ProfilePanelResize">
+            <summary>
+            Resizes and repositions the profile panel, keeping it centered and maintaining a maximum size.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Toggles the visibility of the navigation menu panel. Initializes it if it doesn't already exist.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavButton_type_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles click events on navigation buttons that filter media by type (e.g., "Media", "Comics").
+            Sets the sorting conditions based on the selected type and updates the displayed media list.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavNameLabel_Click(System.Object,System.EventArgs)">
+            <summary>
+            Navigates back to the home view when the navigation label is clicked.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.GoToNewMedia_button_Click(System.Object,System.EventArgs)">
+            <summary>
+            Clears the main panel and loads a list of new media. Updates the navigation label to "New".
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.LoginButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Opens the login form. Upon successful login, updates the current user and displays a welcome message.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.UserPanel_Click(System.Object,System.EventArgs)">
+            <summary>
+            Toggles the visibility of the user navigation panel. Initializes it if it doesn't already exist.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ProfileButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Clears the main panel and displays the user's profile information.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ExitButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Logs out the current user, clears saved login details, and displays the login button.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.MyMediaList_Click(System.Object,System.EventArgs)">
+            <summary>
+            Loads a list of completed media items when the "My Media List" button is clicked.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ProfileSettingsButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Clears the main panel and opens the profile settings panel for the current user.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.AddButton_Click(System.String)">
+            <summary>
+            Opens the "Add Media" form with the specified media type, allowing the user to add new items.
+            </summary>
+            <param name="type">The type of media to add (e.g., "book").</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.SaveUserSettingsButton_Click">
+            <summary>
+            Saves the current user's settings, including nickname, email, description, image URL, and birthday.
+            Updates the user's password if provided.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ChangeButtonForeColor(System.Windows.Forms.Label,System.Drawing.Color)">
+            <summary>
+            Changes the foreground color of a specified label.
+            </summary>
+            <param name="button">The label control whose foreground color will be changed.</param>
+            <param name="newColor">The color to set for the label's foreground.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavButton_MouseEnter(System.Object,System.EventArgs)">
+            <summary>
+            Handles the mouse enter event for navigation buttons, changing background
+            and foreground colors to indicate focus.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.NavButton_MouseLeave(System.Object,System.EventArgs)">
+            <summary>
+            Handles the mouse leave event for navigation buttons, restoring
+            background and foreground colors to their default state.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a Button.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.SearchTextBox_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Handles the focus enter event for the search text box. Clears placeholder
+            text ("Search") and sets the text color to black.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a text box.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.SearchTextBox_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Handles the focus leave event for the search text box. Restores placeholder
+            text and sets the text color to gray if the box is empty.
+            </summary>
+            <param name="sender">The object that triggered the event, expected to be a text box.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.Verification(System.String,System.String)">
+            <summary>
+            Verifies user credentials and displays the user panel if authenticated.
+            Adds a login button if authentication fails.
+            </summary>
+            <param name="ul">The username or login.</param>
+            <param name="up">The user password.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ChangeNavLabelText(System.String)">
+            <summary>
+            Updates the navigation button's text with the specified page name.
+            </summary>
+            <param name="newNavPageName">The name of the new navigation page to display.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ThemeButton">
+            <summary>
+            Toggles between light and dark themes, updating the appearance of the navigation
+            and main panels and recreating user settings. Saves the theme setting for future sessions.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.LoadMedia(System.String,System.String)">
+            <summary>
+            Clears the main panel and updates the navigation label based on the specified
+            media type and status. Initializes media loading conditions and displays the media list panel.
+            </summary>
+            <param name="mediaType">The type of media to load (e.g., Book, Game).</param>
+            <param name="Status">The status of the media (e.g., available, watched, read).</param>
+        </member>
+        <member name="F:MediaNexus.HomeForm.conditions">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createNavMediaMenuPanel">
+            <summary>
+            Creates and configures a navigation menu panel containing buttons for different media types.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createNavMediaButton(System.String,System.String)">
+            <summary>
+            Creates a styled navigation button for the media navigation panel with specified name and text.
+            </summary>
+            <param name="buttonName">The name to assign to the button, used as its identifier.</param>
+            <param name="buttonText">The text to display on the button.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.Button"/> with event handlers.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMainMediaPanel">
+            <summary>
+            Initializes and configures the main media panel within the application, setting its dimensions,
+            background color, and adding necessary child controls such as a "All Media" button, a recent media panel,
+            and a media history/navigation panel.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createGoToAllMediaButton">
+            <summary>
+            Creates and configures a button panel that navigates to the "All Media" section.
+            Event handlers are attached to handle mouse interactions and navigation.
+            </summary>
+            <returns>A configured <see cref="T:System.Windows.Forms.Panel"/> that acts as a button to navigate to the "All Media" section.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.AddRecentMediaPanel">
+            <summary>
+            Add and configures the recent media panel within the main media panel, setting its size, position, 
+            and adding a layout for displaying last 5 media blocks with default sorting conditions.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateMediaBlocks(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates a <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing media blocks arranged in a specified number of columns and rows.
+            Media blocks are populated with media items filtered by the current sorting conditions and displayed according to the specified page.
+            </summary>
+            <param name="columnCount">The number of columns in the layout.</param>
+            <param name="rowCount">The number of rows in the layout.</param>
+            <param name="numPage">The page number to fetch a specific set of media items.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.TableLayoutPanel"/> populated with media blocks for the specified page.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateRecentMediaBlock(System.String,MediaNexus_Backend.MainMedia)">
+            <summary>
+            Creates a media block panel for displaying a media item, including its image, title, and studio label. 
+            The media block is interactive, with event handlers for mouse interactions and navigation to a detailed view of the media item.
+            </summary>
+            <param name="name">The unique name identifier for the media block panel.</param>
+            <param name="currentMedia">The media item of type <see cref="T:MediaNexus_Backend.MainMedia"/> to display within the block.</param>
+            <returns>A configured <see cref="T:System.Windows.Forms.Panel"/> representing the media block.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMediaHistoryAndNavPanel">
+            <summary>
+            Initializes and sets up the media history and navigation panel within the main media panel. 
+            This panel includes buttons for navigating to different media categories such as Media, Books, and Comics, 
+            as well as a section displaying media history. The layout is organized using a table layout with 
+            specified column styles for responsiveness.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createHistoryPanel">
+            <summary>
+            Creates and configures a panel for displaying media history.
+            The panel is styled with the user's theme color for history panels, 
+            automatically sizes itself to its content, and fills the available space.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> configured for media history display.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMediaButton(System.String,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
+            <summary>
+            Creates a media button panel with specified text and color settings.
+            The button consists of a background panel, a text label, and an arrow label,
+            arranged using a TableLayoutPanel for proper alignment and responsiveness.
+            </summary>
+            <param name="buttonText">The text to be displayed on the button.</param>
+            <param name="bgColor">The background color of the button.</param>
+            <param name="textColor">The color of the text on the button.</param>
+            <param name="bpColor">The color of the background panel behind the button.</param>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> representing the media button.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMediaListPanel(System.Int32)">
+            <summary>
+            Creates and configures the media list panel with sorting options.
+            This panel is displayed on the main application window and includes
+            controls for filtering and sorting media items based on user selection.
+            </summary>
+            <param name="page">The current page number for pagination. Default is 1.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.SortPanel">
+            <summary>
+            Creates a sorting panel that contains various sorting options for media items.
+            This panel includes sorting options for media type, genres, user lists, and media status.
+            A search button is provided to trigger filtering based on the selected options.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the sorting controls.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.GetSelectedOptions(System.Windows.Forms.FlowLayoutPanel)">
+            <summary>
+            Retrieves the selected options from a flow layout panel containing checkboxes.
+            Only the checked options are collected and returned as an array of strings.
+            </summary>
+            <param name="flowLayoutPanel">The <see cref="T:System.Windows.Forms.FlowLayoutPanel"/> containing checkboxes for options.</param>
+            <returns>An array of strings representing the selected options.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.GetSelectedGenres(System.Windows.Forms.FlowLayoutPanel)">
+            <summary>
+            Retrieves the selected genres from a flow layout panel containing checkboxes.
+            Each checked checkbox is converted into a <see cref="T:MediaNexus_Backend.Genres"/> object and returned as an array.
+            </summary>
+            <param name="flowLayoutPanel">The <see cref="T:System.Windows.Forms.FlowLayoutPanel"/> containing checkboxes for genres.</param>
+            <returns>An array of <see cref="T:MediaNexus_Backend.Genres"/> objects representing the selected genres.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateMediaSortPanel">
+            <summary>
+            Creates a sorting panel specifically for media types.
+            The panel includes a label and checkboxes for different media types such as Media, Book, Comics, and Game.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the media type sorting controls.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateGenresSortPanel">
+            <summary>
+            Creates a sorting panel for genres.
+            The panel includes a label and checkboxes for available genres retrieved from the media service.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the genre sorting controls.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateUserListSortPanel">
+            <summary>
+            Creates a sorting panel for user lists.
+            The panel includes a label and checkboxes representing the status of media items (e.g., InProcess, Completed, Planned, Dropped).
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the user list sorting controls.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateMediaStatusSortPanel">
+            <summary>
+            Creates a sorting panel for media status.
+            The panel includes a label and checkboxes for various media statuses such as Released, Ongoing, Announced, Canceled, and Delayed.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the media status sorting controls.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateMediaCheckBoxes(System.String[])">
+            <summary>
+            Creates a flow layout panel containing checkboxes for the specified media types.
+            Each checkbox is labeled with the corresponding media type and styled with a specified background color.
+            </summary>
+            <param name="types">An array of strings representing media types (e.g., "Media", "Book", "Comics", "Game").</param>
+            <returns>A <see cref="T:System.Windows.Forms.FlowLayoutPanel"/> containing checkboxes for the media types.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateGenresCheckBoxes(MediaNexus_Backend.Genres[])">
+            <summary>
+            Creates a flow layout panel containing checkboxes for the specified genres.
+            Each checkbox is labeled with the genre name and styled with a specified background color.
+            The GenreID is stored in the checkbox's Tag property for later use.
+            </summary>
+            <param name="genres">An array of <see cref="T:MediaNexus_Backend.Genres"/> objects representing available genres.</param>
+            <returns>A <see cref="T:System.Windows.Forms.FlowLayoutPanel"/> containing checkboxes for the genres.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createPages">
+            <summary>
+            Creates a pagination control for the media list, allowing navigation through pages of media items.
+            If the pagination control already exists, it removes it before creating a new one.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreatePageButton(System.Int32,System.Boolean)">
+            <summary>
+            Creates a button representing a specific page number for pagination.
+            The button's appearance changes based on whether it is the current page or not.
+            </summary>
+            <param name="pageNumber">The number of the page the button represents.</param>
+            <param name="isCurrent">A boolean indicating if this button is for the current page.</param>
+            <returns>A <see cref="T:System.Windows.Forms.Button"/> representing the specified page.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.AddMediaList(System.Int32)">
+            <summary>
+            Adds a list of media items to the display, based on the specified page number.
+            If a media list already exists, it removes it before creating a new one.
+            The media items are organized into blocks based on the current available space.
+            </summary>
+            <param name="pageNumber">The number of the page of media items to display.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createLoginButton">
+            <summary>
+            Creates a customizable "Login" button with specific design and behavior.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.addUserPanel(MediaNexus_Backend.User)">
+            <summary>
+            Creates and adds a user panel to the navigation layout with the user's profile picture, nickname,
+            and a dropdown arrow for additional navigation options.
+            </summary>
+            <param name="user">The user object containing details such as nickname and profile picture URL.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createUserNav(System.String)">
+            <summary>
+            Creates a user navigation panel with options like Profile, My Media List, Settings, and Exit.
+            If the user has an admin or moderator role, additional control options are added.
+            </summary>
+            <param name="role">The user's role, which determines whether admin options are displayed.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createUserNavButton(System.String,System.EventHandler,System.Boolean)">
+            <summary>
+            Creates a navigation button with specified text, click handler, and an optional "Add" prefix.
+            </summary>
+            <param name="buttonText">Text to display on the button.</param>
+            <param name="onClick">Event handler for the button click action.</param>
+            <param name="isAddingButton">Indicates whether to prefix button text with "Add".</param>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> containing the stylized button.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createSettingsPanel(MediaNexus_Backend.User)">
+            <summary>
+            Creates and displays the settings panel for a user, including username display,
+            and a form for updating user settings.
+            </summary>
+            <param name="user">The user object containing the user's nickname and other information.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createUsernameLine(System.String)">
+            <summary>
+            Creates a panel displaying the user's name.
+            </summary>
+            <param name="username">The username to be displayed.</param>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> containing the username label.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateSettingsForm">
+            <summary>
+            Creates the settings form layout, including various fields for user settings,
+            such as nickname, email, and password fields.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the settings form fields.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createInfoPanel">
+            <summary>
+            Creates a panel containing fields for user information settings,
+            including nickname, email, passwords, description, and birthday.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing user info fields.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateSaveButton">
+            <summary>
+            Creates a button for saving user settings.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.Button"/> configured for saving user settings.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.CreateThemeButton">
+            <summary>
+            Creates a button for changing the theme of the application.
+            </summary>
+            <returns>A <see cref="T:System.Windows.Forms.Button"/> configured for theme change.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.addMediInfoPanel(MediaNexus_Backend.MainMedia)">
+            <summary>
+            Adds the media information panel to the main panel, clearing existing controls and updating the navigation label.
+            </summary>
+            <param name="media">The <see cref="T:MediaNexus_Backend.MainMedia"/> object containing media information to be displayed.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMediaInfoPanel(MediaNexus_Backend.MainMedia)">
+            <summary>
+            Creates a panel for displaying information about a specific media item.
+            </summary>
+            <param name="media">The <see cref="T:MediaNexus_Backend.MainMedia"/> object containing media information.</param>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> containing the media information layout.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.mediaInfo(MediaNexus_Backend.MainMedia)">
+            <summary>
+            Creates a table layout panel containing detailed information about the media item,
+            including an image and additional media details.
+            </summary>
+            <param name="media">The <see cref="T:MediaNexus_Backend.MainMedia"/> object containing media information.</param>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the media information layout.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.showResponseButton(System.Boolean,System.Windows.Forms.TableLayoutPanel,MediaNexus_Backend.MainMedia)">
+            <summary>
+            Displays a button that allows navigation between media information and user responses.
+            </summary>
+            <param name="isResponse">Indicates whether the current view is a response view.</param>
+            <param name="rowsTableLayout">The <see cref="T:System.Windows.Forms.TableLayoutPanel"/> to which the buttons will be added.</param>
+            <param name="media">The <see cref="T:MediaNexus_Backend.MainMedia"/> object containing media information.</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createMainResponsePanel(MediaNexus_Backend.MainMedia,System.Boolean)">
+            <summary>
+            Creates a panel for user responses related to the media item, including a text box for input
+            and a button to submit the response.
+            </summary>
+            <param name="media">The <see cref="T:MediaNexus_Backend.MainMedia"/> object containing media information.</param>
+            <param name="isOnly">Indicates whether the response panel is standalone or part of a larger layout.</param>
+            <returns>A <see cref="T:System.Windows.Forms.TableLayoutPanel"/> containing the user response layout.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createResponsePanel(MediaNexus_Backend.UserResponse)">
+            <summary>
+            Creates a response panel for displaying user responses in the UI.
+            </summary>
+            <param name="userResponse">An instance of <see cref="T:MediaNexus_Backend.UserResponse"/> containing the user's response data.</param>
+            <returns>A <see cref="T:System.Windows.Forms.Panel"/> configured to display the user's response information, including the user's image, nickname, and the response text.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.addMediaInformation(MediaNexus_Backend.MainMediaType,System.Int32)">
+            <summary>
+            Adds a panel that displays detailed information about the specified media.
+            </summary>
+            <param name="type">The type of the media being displayed.</param>
+            <param name="mediaID">The unique identifier of the media item.</param>
+            <returns>A Panel containing the media's detailed information.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createInfoLabel(System.String,System.String,System.Drawing.Font)">
+            <summary>
+            Creates a label displaying a piece of media information.
+            </summary>
+            <param name="name">The label name (title).</param>
+            <param name="val">The value associated with the label.</param>
+            <param name="font">The font style for the label.</param>
+            <returns>A Label containing the specified name and value.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.ControlEpisodePanel(System.String,System.Int32)">
+            <summary>
+            Creates a panel that displays the media's episode image and controls for user interactions.
+            </summary>
+            <param name="url">The URL of the media image.</param>
+            <param name="mediaId">The unique identifier of the media item.</param>
+            <returns>A Panel containing the episode controls and media image.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.MediaControl(MediaNexus_Backend.UserMediaStatus)">
+            <summary>
+            Creates a panel that allows users to manage their media status, such as adding to a list or updating progress.
+            </summary>
+            <param name="inUserList">The user's current status for the media, or null if not in the user's list.</param>
+            <returns>A Panel containing the media control interface for the user.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.EpisodeConrol(MediaNexus_Backend.UserMediaStatus)">
+            <summary>
+            Creates a table layout panel for managing episode count with increment and decrement buttons.
+            </summary>
+            <param name="inUserList">The user's current status for the media.</param>
+            <returns>A TableLayoutPanel containing controls for episode management.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.UpdateEpisodeCount(MediaNexus_Backend.UserMediaStatus,System.Windows.Forms.Label,System.Int32)">
+            <summary>
+            Updates the episode count for the user's media status and refreshes the displayed count.
+            </summary>
+            <param name="inUserList">The user's current status for the media.</param>
+            <param name="episodeCountLabel">The label displaying the current episode count.</param>
+            <param name="change">The change in episode count (positive to increment, negative to decrement).</param>
+        </member>
+        <member name="M:MediaNexus.HomeForm.AddUserProfile">
+            <summary>
+            Adds a user profile panel to the main panel, displaying user information and media statistics.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.HomeForm.createUserInfo">
+            <summary>
+            Creates a panel displaying user information, including profile picture, nickname, and registration details.
+            </summary>
+            <returns>A TableLayoutPanel containing the user information layout.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.userListInfo">
+            <summary>
+            Creates a panel displaying statistics of user media, categorized by type (Media, Book, Game, Comics).
+            </summary>
+            <returns>A TableLayoutPanel containing the media statistics layout.</returns>
+        </member>
+        <member name="M:MediaNexus.HomeForm.mediaInfoLine(System.Int32,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            Creates a row in the media statistics table displaying the counts of each media status (completed, planned, in process, dropped).
+            </summary>
+            <param name="completed">The count of completed media.</param>
+            <param name="planned">The count of planned media.</param>
+            <param name="inProcess">The count of media in process.</param>
+            <param name="dropped">The count of dropped media.</param>
+            <param name="mediaType">The type of media (e.g., Media, Book, Game, Comics).</param>
+            <returns>A TableLayoutPanel representing the media statistics line.</returns>
+        </member>
+        <member name="P:MediaNexus.LoginForm.LoggedInUser">
+            <summary>
+            Gets the user who has successfully logged in.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MediaNexus.LoginForm"/> class
+            and sets up the components for the login interface.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.TextBoxUsername_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Event handler for when the username text box gains focus. 
+            Clears the placeholder text ("Username") and sets the text color to white.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.TextBoxUsername_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Event handler for when the username text box loses focus. 
+            If the field is empty, it restores the placeholder text ("Username") 
+            and changes the text color to gray.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.TextBoxPassword_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Event handler for when the password text box gains focus. 
+            Clears the placeholder text ("Password"), enables password masking,
+            and changes the text color to white.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.TextBoxPassword_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Event handler for when the password text box loses focus. 
+            If the field is empty, it restores the placeholder text ("Password"), 
+            disables password masking, and changes the text color to gray.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.ButtonLogin_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the login button click event. Verifies the user's credentials
+            by checking with the <see cref="M:MediaNexus_Backend.MediaService.CheckLogin(System.String,System.String)"/> method.
+            If the login is successful, stores the credentials if "Remember Me" 
+            is checked and closes the form. Otherwise, shows an error message.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.ButtonRegister_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the registration button click event. Closes the login form 
+            and opens the registration form, allowing the user to create a new account.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.LoginForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.LoginForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:MediaNexus.LoginForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:MediaNexus.RegisterForm">
+            <summary>
+            Represents a registration form for creating a new user account.
+            Allows users to input their username, password, and email, and handles 
+            placeholder text for these fields. Provides feedback on the success or 
+            failure of the registration process.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MediaNexus.RegisterForm"/> class,
+            setting up a fixed dialog form style with no maximize option.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.buttonRegister_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the register button click event. Attempts to register a new user 
+            with the input username, password, and email. Provides feedback based on 
+            the registration result, informing the user if registration is successful 
+            or if there are issues with the provided credentials.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxUsername_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Clears the placeholder text ("Username") in the username text box 
+            when the box gains focus, and sets the text color to black.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxUsername_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Restores the placeholder text ("Username") in the username text box 
+            if the box loses focus and is empty, setting the text color to gray.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxPassword_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Clears the placeholder text ("Password") in the password text box 
+            when the box gains focus, enables password masking, and sets the 
+            text color to black.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxPassword_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Restores the placeholder text ("Password") in the password text box 
+            if the box loses focus and is empty, disables password masking, and 
+            sets the text color to gray.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxEmail_Enter(System.Object,System.EventArgs)">
+            <summary>
+            Clears the placeholder text ("Email") in the email text box 
+            when the box gains focus, and sets the text color to black.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.textBoxEmail_Leave(System.Object,System.EventArgs)">
+            <summary>
+            Restores the placeholder text ("Email") in the email text box 
+            if the box loses focus and is empty, setting the text color to gray.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.RegisterForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:MediaNexus.RegisterForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:MediaNexus.Forms.UserMediaStatusForm">
+            <summary>
+            Form for managing the user's status of a specific media item.
+            Allows the user to set, update, or delete the status of the selected media in their list.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.Forms.UserMediaStatusForm.newInUserList">
+            <summary>
+            The user's updated media status after any changes.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.Forms.UserMediaStatusForm.Media">
+            <summary>
+            The media item associated with this form.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.Forms.UserMediaStatusForm.#ctor(MediaNexus_Backend.UserMediaStatus,MediaNexus_Backend.MainMedia)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MediaNexus.Forms.UserMediaStatusForm"/> class with the given user media status and media item.
+            </summary>
+            <param name="inUserList">The user's current status of the media item.</param>
+            <param name="media">The media item to manage the status for.</param>
+        </member>
+        <member name="M:MediaNexus.Forms.UserMediaStatusForm.SaveButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the event when the save button is clicked. Updates the user's status for the media item based on the selected option.
+            Sets the status in <see cref="F:MediaNexus.Forms.UserMediaStatusForm.newInUserList"/> and updates the ended page or episode if the status is "Completed".
+            </summary>
+        </member>
+        <member name="M:MediaNexus.Forms.UserMediaStatusForm.DeleteButton_Click(System.Object,System.EventArgs)">
+            <summary>
+            Handles the event when the delete button is clicked. Asks for confirmation, and if confirmed,
+            proceeds to delete the user's status for the media item.
+            </summary>
+        </member>
+        <member name="F:MediaNexus.Forms.UserMediaStatusForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.Forms.UserMediaStatusForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:MediaNexus.Forms.UserMediaStatusForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:MediaNexus.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:MediaNexus.Properties.Resources">
+            <summary>
+              Класс ресурса со строгой типизацией для поиска локализованных строк и т.д.
+            </summary>
+        </member>
+        <member name="P:MediaNexus.Properties.Resources.ResourceManager">
+            <summary>
+              Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
+            </summary>
+        </member>
+        <member name="P:MediaNexus.Properties.Resources.Culture">
+            <summary>
+              Перезаписывает свойство CurrentUICulture текущего потока для всех
+              обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
+            </summary>
+        </member>
+    </members>
+</doc>
